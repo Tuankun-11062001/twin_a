@@ -1,0 +1,16 @@
+.category {
+  &_head {
+    @include dynamicAlign();
+    margin-bottom: $margin * 2;
+  }
+  &_add {
+    @include dynamicAlign();
+    &_form {
+      width: 50rem;
+    }
+    &_view {
+      @include dynamicAlign();
+      width: 100%;
+    }
+  }
+}

@@ -1,0 +1,14 @@
+@mixin dynamicAlign(
+  $justify: start,
+  $align: start,
+  $gap: $gap,
+  $direction: row,
+  $wrap: nowrap
+) {
+  display: flex;
+  justify-content: $justify;
+  align-items: $align;
+  gap: $gap;
+  flex-direction: $direction;
+  flex-wrap: $wrap;
+}

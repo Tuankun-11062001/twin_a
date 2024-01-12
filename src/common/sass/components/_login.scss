@@ -1,0 +1,39 @@
+.login {
+  &_body {
+    @include dynamicAlign($direction: column, $align: center);
+    width: 40%;
+  }
+  &_content {
+    background: $color_white;
+    @include dynamicAlign($direction: column, $align: center);
+    width: $width_full;
+    padding: $padding * 2 $padding * 3;
+    border-radius: $border_radius * 2;
+    box-shadow: $box_shadow;
+    h2 {
+      align-self: flex-start;
+    }
+  }
+  &_group {
+    @include dynamicAlign($direction: column);
+    width: $width_full;
+    span {
+      font-size: 1.4rem;
+      color: $color_gray;
+    }
+  }
+  &_error {
+    color: $color_red;
+    align-self: flex-start;
+  }
+  &_footer {
+    @include dynamicAlign();
+    a {
+      color: $color_gray;
+      transition: $transition;
+      &:hover {
+        color: $color_black;
+      }
+    }
+  }
+}

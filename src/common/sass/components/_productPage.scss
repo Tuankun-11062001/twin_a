@@ -1,0 +1,31 @@
+.product {
+  &_head {
+    @include dynamicAlign($gap: $gap * 2);
+    margin-bottom: $margin * 2;
+
+    div {
+      &:nth-child(2) {
+        flex: 1;
+      }
+      &:last-child {
+        flex: 1;
+      }
+    }
+  }
+  &_detail_page {
+    @include dynamicAlign($gap: $gap * 2);
+    &_left {
+      flex: 1;
+    }
+    &_right {
+      flex: 0.6 !important;
+      &_bottom {
+        @include dynamicAlign();
+        margin-top: $margin + 1rem;
+        div {
+          flex: 1;
+        }
+      }
+    }
+  }
+}

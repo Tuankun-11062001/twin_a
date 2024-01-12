@@ -1,0 +1,101 @@
+.navigation {
+  &_left {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 35rem;
+    background: $color_white;
+    margin: $margin;
+    border-radius: $border_radius;
+    box-shadow: $box_shadow;
+    padding: $padding $padding * 2;
+
+    &_list {
+      @include dynamicAlign($direction: column);
+      a {
+        @include dynamicAlign($align: center, $gap: $padding * 2);
+        width: $width_full;
+        padding: $padding;
+        border-radius: $border_radius;
+        font-size: $font_size + 0.4rem;
+        transition: $transition;
+        &:hover {
+          background: $color_gray_light;
+        }
+        &.active {
+          background: $color_black;
+          p {
+            color: $color_white;
+          }
+          svg {
+            rect,
+            path {
+              stroke: $color_white;
+            }
+          }
+        }
+      }
+    }
+  }
+  &_top {
+    position: fixed;
+    right: 0;
+    top: 0;
+    left: 40rem;
+    padding: $padding * 2 $padding;
+    border-radius: $border_radius;
+    margin-right: 2rem;
+    background: $color_milk;
+    z-index: 9;
+    @include dynamicAlign($justify: space-between, $align: center);
+    &_search {
+      @include dynamicAlign($align: center);
+      border-bottom: $border_default;
+      flex: 1;
+      input {
+        width: 100%;
+        border: none;
+        font-size: $font_size;
+        background: transparent;
+        padding: $padding;
+        outline: none;
+      }
+    }
+    &_right {
+      @include dynamicAlign(
+        $justify: space-between,
+        $align: center,
+        $gap: $gap * 2
+      );
+    }
+    &_money {
+      font-size: $font_size + 0.4rem;
+    }
+    &_user {
+      @include dynamicAlign($justify: space-between, $align: center);
+      cursor: pointer;
+      position: relative;
+      p,
+      img {
+        pointer-events: none;
+      }
+    }
+    &_box {
+      position: absolute;
+      right: -25rem;
+      top: 100%;
+      background: $color_black;
+      color: $color_white;
+      width: 20rem;
+      padding: $padding;
+      border-radius: $border_radius;
+      box-shadow: $box_shadow;
+      @include dynamicAlign($direction: column, $gap: $gap);
+      transition: $transition;
+      &.active {
+        right: 0;
+      }
+    }
+  }
+}

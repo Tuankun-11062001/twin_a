@@ -1,0 +1,12 @@
+.layout {
+  background: $color_milk;
+  &_login,
+  &_signup,
+  &_forgot {
+    height: 100dvh;
+    @include dynamicAlign(center, center);
+  }
+  &_body {
+    padding: $padding * 9 $padding * 2 $padding * 2 $padding * 40;
+  }
+}

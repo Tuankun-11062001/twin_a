@@ -1,0 +1,79 @@
+.button {
+  padding: $padding $padding * 2;
+  border-radius: $border_radius;
+  border: $border_default;
+  font-size: $font_size;
+  background: transparent;
+  cursor: pointer;
+  &_login,
+  &_signup,
+  &_forgot {
+    background: $color_black;
+    color: $color_white;
+    &:hover {
+      background: $color_hover_black;
+      color: $color_white;
+    }
+  }
+  &_top_admin {
+    border: none;
+    display: block;
+    width: $width_full;
+    color: $color_white;
+    transition: $transition;
+    &:hover {
+      background: $color_gray_light;
+      color: $color_black;
+    }
+  }
+
+  &_category,
+  &_add_product {
+    background: $color_black;
+    color: $color_white;
+    transition: $transition;
+    &:hover {
+      background-color: $color_hover_black;
+    }
+  }
+
+  &_breadcrum_detail_back,
+  &_breadcrum_add_back {
+    padding: 0;
+    border: none;
+    @include dynamicAlign($justify: center, $align: center);
+  }
+
+  &_product_delete {
+    background: $color_black;
+    color: $color_white;
+    transition: $transition;
+    @include dynamicAlign($justify: center, $align: center);
+    &:hover {
+      background-color: $color_hover_black;
+    }
+  }
+
+  &_form_add {
+    padding: 0;
+    border: none;
+  }
+  &_yes,
+  &_no,
+  &_add {
+    color: $color_white;
+    transition: $transition;
+    &:hover {
+      background-color: $color_white;
+      color: $color_black;
+    }
+  }
+
+  &_add_category {
+    transition: $transition;
+    &:hover {
+      background: $color_black;
+      color: $color_white;
+    }
+  }
+}

@@ -1,0 +1,10 @@
+.chart {
+  &_column {
+    width: $width_full;
+    svg {
+      rect {
+        width: 100%;
+      }
+    }
+  }
+}

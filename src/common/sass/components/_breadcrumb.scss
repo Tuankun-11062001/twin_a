@@ -1,0 +1,34 @@
+.breadcrumb {
+  margin-bottom: $margin;
+  &_product {
+    @include dynamicAlign($align: center, $justify: space-between);
+    width: $width_full;
+    div {
+      button:first-child {
+        margin-right: $margin;
+      }
+    }
+    &_detail {
+      @include dynamicAlign($align: center, $justify: space-between);
+      width: $width_full;
+      &_head {
+        @include dynamicAlign($align: center);
+      }
+    }
+    &_add {
+      @include dynamicAlign($align: center, $justify: space-between);
+      width: $width_full;
+      &_head {
+        @include dynamicAlign($align: center);
+      }
+    }
+  }
+  &_category {
+    @include dynamicAlign($justify: space-between, $align: center);
+    div {
+      button:first-child {
+        margin-right: $margin;
+      }
+    }
+  }
+}

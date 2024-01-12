@@ -1,0 +1,142 @@
+.box {
+  background: $color_white;
+  color: $color_black;
+  box-shadow: $box_shadow;
+  padding: $padding;
+  border-radius: $border_radius;
+  &_view {
+    flex: 0.6;
+    div:first-child {
+      @include dynamicAlign($align: center);
+    }
+    h3 {
+      font-size: $font_size + 1rem;
+    }
+    &_small {
+      flex: 0.3;
+    }
+  }
+
+  &_view_list {
+    flex: 1;
+    h3 {
+      font-size: $font_size + 1rem;
+    }
+    @include dynamicAlign($direction: column);
+
+    ul {
+      @include dynamicAlign($direction: column);
+      width: $width_full;
+      li {
+        @include dynamicAlign();
+        width: $width_full;
+
+        div {
+          flex: 1;
+          @include dynamicAlign();
+          p:first-child {
+            flex: 0.08;
+          }
+          p:last-child {
+            flex: 1;
+          }
+        }
+      }
+    }
+  }
+
+  &_list {
+    flex: 1;
+    @include dynamicAlign($direction: column);
+    &_head {
+      @include dynamicAlign($align: center, $justify: space-between);
+      width: $width_full;
+    }
+  }
+
+  &_edit_product {
+    @include dynamicAlign($direction: column);
+
+    &_head {
+      @include dynamicAlign($align: center, $justify: space-between);
+      width: $width_full;
+    }
+  }
+
+  &_view_edit_product {
+    &_head {
+      @include dynamicAlign($align: center);
+    }
+    &_body {
+      margin-top: $margin;
+      @include dynamicAlign($align: center, $justify: center);
+    }
+  }
+
+  &_product {
+    width: 60%;
+    img {
+      width: 100%;
+      height: 20rem;
+      object-fit: contain;
+    }
+    h3 {
+      font-size: $font_size + 0.4rem;
+    }
+    &_content {
+      @include dynamicAlign($direction: column);
+      div {
+        width: $width_full;
+        @include dynamicAlign($justify: space-between);
+        p:first-child {
+          color: $color_gray;
+        }
+      }
+    }
+    &_colors {
+      margin-top: $margin;
+      @include dynamicAlign();
+      span {
+        width: 2rem;
+        height: 2rem;
+        border-radius: $border_radius + 10rem;
+        cursor: pointer;
+        &.active {
+          border: 0.2rem solid $color_black;
+        }
+      }
+    }
+    &_price {
+      margin-top: $margin + 0.5rem;
+      font-size: $font_size + 1rem;
+      font-weight: 600;
+    }
+  }
+
+  &_category {
+    @include dynamicAlign($direction: column);
+    flex: 1;
+    &_list {
+      @include dynamicAlign($direction: column);
+      width: 100%;
+    }
+    &_item {
+      @include dynamicAlign($justify: space-between, $align: center);
+      width: inherit;
+
+      &_left {
+        @include dynamicAlign();
+        flex: 1;
+        p:first-child {
+          flex: 0.1;
+        }
+        p:nth-child(2) {
+          flex: 0.4;
+        }
+      }
+      div {
+        @include dynamicAlign();
+      }
+    }
+  }
+}

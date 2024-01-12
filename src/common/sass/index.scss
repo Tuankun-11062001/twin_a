@@ -1,0 +1,25 @@
+@import "./variable";
+@import "./initt";
+@import "./mixin";
+@import "./layout";
+
+// component widgets
+@import "./components/widget/input";
+@import "./components/widget/button";
+@import "./components/widget/select";
+@import "./components/widget/table";
+@import "./components/widget/formGroup";
+
+// component
+@import "./components/login";
+@import "./components/signup";
+@import "./components/notification";
+@import "./components/forgotPass";
+@import "./components/logo";
+@import "./components/navigation";
+@import "./components/box";
+@import "./components/breadcrumb";
+@import "./components/chart";
+@import "./components/dashboard";
+@import "./components/productPage";
+@import "./components/category";

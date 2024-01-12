@@ -1,0 +1,12 @@
+.table {
+  &_list {
+    width: $width_full;
+    text-align: center;
+    tr:not(:first-child) {
+      cursor: pointer;
+      &:hover {
+        color: $color_gray;
+      }
+    }
+  }
+}

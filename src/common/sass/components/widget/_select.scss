@@ -1,0 +1,20 @@
+.select {
+  padding: $padding $padding * 3;
+  font-size: $font_size;
+  border-radius: $border_radius;
+  outline: none;
+  cursor: pointer;
+  option {
+    padding: $padding 0;
+  }
+  &_view_list {
+    align-self: flex-end;
+    background: $color_gray_dark;
+    color: $color-white;
+    border: none;
+  }
+  &_edit_product,
+  &_edit_category {
+    width: $width_full;
+  }
+}

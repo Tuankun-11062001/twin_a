@@ -1,0 +1,63 @@
+.notification {
+  &_overlay {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background: $color_overlay_milk;
+    @include dynamicAlign($justify: center);
+    // margin-top: $margin * 10;
+    z-index: 12;
+  }
+  &_content {
+    background: $color_black;
+    color: $color_white;
+    padding: $padding * 2;
+    margin-top: $margin + 5rem;
+    width: 25%;
+    border-radius: $border_radius;
+    box-shadow: $box_shadow;
+    h2 {
+      font-size: $font_size + 0.5rem;
+    }
+  }
+  &_signup,
+  &_forgot {
+    @include dynamicAlign($direction: column, $align: center);
+    h2 {
+      align-self: flex-start;
+    }
+    p {
+      text-align: center;
+      width: $width_full;
+    }
+    a {
+      color: $color_white;
+      padding: $padding - 0.5rem $padding;
+      border-radius: $border_radius - 0.5rem;
+      background: $color_gray;
+      transition: $transition;
+      &:hover {
+        background: $color_gray_light;
+      }
+    }
+  }
+  &_delete_product {
+    @include dynamicAlign($align: center, $direction: column);
+    .head {
+      @include dynamicAlign($justify: space-between, $align: center);
+      width: $width_full;
+    }
+    .foot {
+      @include dynamicAlign();
+    }
+  }
+  &_add_product {
+    @include dynamicAlign($direction: column, $align: center);
+    h2 {
+      width: $width_full;
+      align-self: flex-start;
+    }
+  }
+}

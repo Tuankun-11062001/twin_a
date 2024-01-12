@@ -1,0 +1,37 @@
+.input {
+  @include dynamicAlign();
+  padding: $padding;
+  border-radius: $border_radius;
+  background: $color_milk;
+  border: $border_default;
+  outline: none;
+  font-size: $font_size;
+  &:focus {
+    border-color: $color_black;
+  }
+  &_login,
+  &_signup,
+  &_forgot,
+  &_form_group {
+    width: $width_full;
+  }
+}
+.disabled {
+  color: red;
+}
+
+.area {
+  @include dynamicAlign();
+  padding: $padding;
+  border-radius: $border_radius;
+  background: $color_milk;
+  border: $border_default;
+  outline: none;
+  font-size: $font_size;
+  width: $width_full;
+  height: 20rem;
+  resize: none;
+  &:focus {
+    border-color: $color_black;
+  }
+}

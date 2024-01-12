@@ -1,0 +1,10 @@
+.dashboard {
+  &_view {
+    @include dynamicAlign($gap: $gap * 2);
+  }
+  &_product,
+  &_blog {
+    margin: $margin * 2 0;
+    @include dynamicAlign($gap: $gap * 2);
+  }
+}
