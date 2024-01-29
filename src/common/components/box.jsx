@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React from "react";
 import Select from "./widget/select";
 import Svgs from "../localData/svgs";
-import Table from "./widget/table";
+import { TableFull, TableShort, TableViewList } from "./widget/table";
 import ChartLine from "./chart";
 import FormGroup from "./widget/formGroup";
 import Button from "./widget/button";
+import { useProviderCategory } from "../providers";
+import { enumProduct } from "../enum/product";
+import { enumBlog } from "../enum/blog";
+import Tiptap from "./tiptap";
 
 const Box = ({ type, data, classname }) => {
   switch (type) {
@@ -20,10 +24,10 @@ const Box = ({ type, data, classname }) => {
       return <BoxViewEditProduct data={data} />;
     case "addProduct":
       return <BoxAddProduct data={data} />;
-    case "category":
-      return <BoxCategory />;
-    case "addCategory":
-      return <BoxAddCategory data={data} />;
+    case "viewListCategoryAndPartner":
+      return <BoxViewList data={data} />;
+    case "addCategoryAndPartner":
+      return <BoxAdd data={data} />;
     default:
       return null;
   }
@@ -43,52 +47,66 @@ const BoxView = ({ data, classname }) => {
   );
 };
 
-const BoxViewListToday = ({ data }) => {
+const BoxViewList = ({ data }) => {
   return (
     <div className="box box_view_list">
       <Svgs type={data.svg} />
       <p>{data.title}</p>
       <h3>{data.view}</h3>
       <Select
-        data={data.dataSelect}
+        data={data.selects}
         onListen={() => console.log("change")}
         classname="select select_view_list"
       />
-      <ul>
-        {data.dataList?.map((data, indx) => (
-          <li key={indx}>
-            <div>
-              <p>{indx + 1}</p>
-              <p>{data.code}</p>
-              <p>{data.title}</p>
-            </div>
-            <p>{data.view}</p>
-          </li>
-        ))}
-      </ul>
+      <TableViewList data={data.dataTable} />
     </div>
   );
 };
 
 const BoxList = ({ data }) => {
   return (
-    <div className="box box_list">
-      <Svgs type={data.svg} />
-      <div className="box_list_head">
-        <p>{data.title + `(${data.total})`}</p>
-        <Select
-          data={data?.dataViewSelect}
-          onListen={() => console.log("change")}
-          classname="select select_list"
-        />
-      </div>
-      <Table
-        onListen={data?.navigateDetailProduct}
-        data={data?.dataView}
-        titles={data?.titleTable}
-        classname="table table_list"
-      />
-    </div>
+    <>
+      {data.type === enumProduct.listShort.type ||
+      data.type === enumBlog.listShort.type ? (
+        <div className="box box_list">
+          <Svgs type={data.svg} />
+          <div className="box_list_head">
+            <p>{data.title + `(${data.total})`}</p>
+            <Select
+              data={data?.selects}
+              onListen={() => console.log("change")}
+              classname="select select_list"
+            />
+          </div>
+          <TableShort
+            type={data.dataTable.type}
+            onListen={data.dataTable?.navigateDetail}
+            data={data.dataTable?.dataView}
+            titles={data.dataTable?.titles}
+            classname="table table_list"
+          />
+        </div>
+      ) : (
+        <div className="box box_list">
+          <Svgs type={data?.svg} />
+          <div className="box_list_head">
+            <p>{data?.title + `(${data?.total})`}</p>
+            <Select
+              data={data?.selects}
+              onListen={() => console.log("change")}
+              classname="select select_list"
+            />
+          </div>
+          <TableFull
+            type={data?.dataTable.type}
+            onListen={data.dataTable?.navigateDetail}
+            data={data.dataTable?.dataView}
+            titles={data.dataTable?.titles}
+            classname="table table_list"
+          />
+        </div>
+      )}
+    </>
   );
 };
 
@@ -98,104 +116,32 @@ const BoxEditProduct = ({ data }) => {
       <div className="box_edit_product_head">
         <Svgs type="info" />
         <Select
-          data={data.dataSelect}
-          classname="select select_publish"
-          value={data.dataProduct.publish}
-          onListen={data.formListen}
-          name="publish"
+          data={data.selectPublished.data}
+          classname={data.selectPublished.classname}
+          value={data.selectPublished.value}
+          onListen={data.selectPublished.onListen}
+          name={data.selectPublished.name}
         />
       </div>
 
+      <FormGroup type={data.formGroupCode.type} data={data.formGroupCode} />
+      <FormGroup type={data.formGroupTitle.type} data={data.formGroupTitle} />
+      <FormGroup type={data.formGroupImage.type} data={data.formGroupImage} />
       <FormGroup
-        type="normal"
-        classnameFormGroup="form_group"
-        lable="Code Product"
-        inputClassname="input input_form_group"
-        inputListen={data.formListen}
-        inputName="code"
-        inputValue={data.dataProduct.code}
+        type={data.formGroupCategory.type}
+        data={data.formGroupCategory}
       />
+      <FormGroup type={data.formGroupPrice.type} data={data.formGroupPrice} />
       <FormGroup
-        type="normal"
-        classnameFormGroup="form_group"
-        lable="Title"
-        inputClassname="input input_form_group"
-        inputListen={data.formListen}
-        inputName="title"
-        inputValue={data.dataProduct.title}
+        type={data.formGroupPartner.type}
+        data={data.formGroupPartner}
       />
 
+      <FormGroup type={data.formGroupProfit.type} data={data.formGroupProfit} />
       <FormGroup
-        type="add"
-        classnameFormGroup="form_group"
-        lable="Image"
-        classnameButton="button button_form_add"
-        classnameDisplayColor="form_group_display_color"
-        buttonListen={data.onListenAddOne}
-        inputClassname="input input_form_group"
-        inputListen={data.formListen}
-        inputName="name"
-        dataListImage={data.dataProduct.image}
-        addOneColor={data.isOneColor}
-        addOneColorListen={data.onListenAddOneColor}
-        onListenIsAddOneColor={data.onListenAddOne}
-        classnameListInput="form_group form_group_list_input"
-        onListenRemoveColor={data.removeColor}
+        type={data.formGroupDescription.type}
+        data={data.formGroupDescription}
       />
-
-      <FormGroup
-        type="select"
-        classnameFormGroup="form_group"
-        classnameSelect="select select_edit_category"
-        lable="Category"
-        dataSelect={data.dataCategorySelect}
-        inputName="category"
-        inputValue={data.dataProduct.category}
-        inputListen={data.formListen}
-      />
-
-      <FormGroup
-        type="normal"
-        classnameFormGroup="form_group"
-        lable="Price"
-        inputClassname="input input_form_group"
-        inputListen={data.formListen}
-        inputName="price"
-        inputValue={data.dataProduct.price}
-      />
-
-      <FormGroup
-        type="select"
-        classnameFormGroup="form_group"
-        lable="Partner"
-        dataSelect={data.dataParnerSelect}
-        classnameSelect="select select_edit_product"
-        inputValue={data.dataProduct.partner}
-        inputName="partner"
-        inputListen={data.formListen}
-      />
-
-      <FormGroup
-        type="normal"
-        classnameFormGroup="form_group"
-        lable="Profit"
-        inputClassname="input input_form_group"
-        inputListen={data.formListen}
-        inputName="profit"
-        inputValue={data.dataProduct.profit}
-      />
-
-      <FormGroup
-        type="area"
-        classnameFormGroup="form_group"
-        lable="Description"
-        classnameArea="area"
-        inputClassname="input input_form_group"
-        inputListen={data.formListen}
-        inputName="description"
-        inputValue={data.dataProduct.description}
-      />
-
       <Button title="Save" classname="button " onListen={data.onListenSave} />
     </div>
   );
@@ -280,43 +226,59 @@ const BoxAddProduct = ({ data }) => {
         type={data.formGroupDescription.type}
         data={data.formGroupDescription}
       />
-      <Button title="Create" classname="button " onListen={data.onListenSave} />
+      <Button
+        title="Create"
+        classname="button "
+        onListen={data.onListenCreate}
+      />
     </div>
   );
 };
 
-const BoxCategory = () => {
+const BoxViewListCategoryAndPartner = ({ data }) => {
   return (
     <div className="box box_category">
-      <h3>Category</h3>
+      <h3>{data.title}</h3>
       <div className="box_category_list">
-        <div className="box_category_item">
-          <div className="box_category_item_left">
-            <p>stt</p>
-            <p>title</p>
-            <p>number</p>
+        {data.list?.map((item, indx) => (
+          <div className="box_category_item" key={indx}>
+            <div className="box_category_item_left">
+              {data.type === "category" && <p>{item.categoryCode}</p>}
+              <p>{item.title}</p>
+              <p>number</p>
+            </div>
+            <div>
+              <Button
+                title="view"
+                classname="button button_category_view"
+                onListen={() => data.handleView(item)}
+              />
+              <Button
+                title="delete"
+                classname="button button_category_delete"
+                onListen={() => data.handleDelete(item)}
+              />
+            </div>
           </div>
-          <div>
-            <Button title="view" classname="button button_category_view" />
-            <Button title="delete" classname="button button_category_delete" />
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
 };
 
-const BoxAddCategory = ({ data }) => {
+const BoxAddCategoryAndPartner = ({ data }) => {
   return (
-    <div className="box box_edit_product">
-      <div className="box_edit_product_head">
+    <div className="box box_add_category">
+      <div className="box_add_category_head">
         <Svgs type="info" />
       </div>
+      {data.type === "category" && (
+        <FormGroup
+          type={data.formGroupCategoryCode.type}
+          data={data.formGroupCategoryCode}
+        />
+      )}
 
-      <FormGroup
-        type={data.formGroupCategoryCode.type}
-        data={data.formGroupCategoryCode}
-      />
       <FormGroup
         type={data.formGroupCategoryTitle.type}
         data={data.formGroupCategoryTitle}
@@ -331,4 +293,81 @@ const BoxAddCategory = ({ data }) => {
   );
 };
 
-export default Box;
+const BoxAddBlog = ({ data }) => {
+  return (
+    <div className="box box_edit_product">
+      <div className="box_edit_product_head">
+        <Svgs type="info" />
+        <Select
+          data={data.selectPublished.data}
+          classname={data.selectPublished.classname}
+          value={data.selectPublished.value}
+          onListen={data.selectPublished.onListen}
+          name={data.selectPublished.name}
+        />
+      </div>
+
+      <FormGroup type={data.formGroupTitle.type} data={data.formGroupTitle} />
+      <FormGroup
+        type={data.formGroupThumbnail.type}
+        data={data.formGroupThumbnail}
+      />
+      <FormGroup
+        type={data.formGroupDescription.type}
+        data={data.formGroupDescription}
+      />
+      <p>Body</p>
+      <Tiptap data={data.formGroupBody} />
+      <Button
+        title="Create"
+        classname="button "
+        onListen={data.onListenCreate}
+      />
+    </div>
+  );
+};
+
+const BoxViewBlog = ({ data, viewBody }) => {
+  return (
+    <div className="box box_blog_view_card">
+      <div className="head">
+        <p>View Card</p>
+        <Button title="view body" classname="button" onListen={viewBody} />
+      </div>
+      <div className="body">
+        <img src={data.thumbnail} />
+        <div className="content">
+          <span>{data.date || "date"}</span>
+          <h3>{data.title}</h3>
+          <p>{data.description}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const BoxViewBlogBody = ({ data, close }) => {
+  return (
+    <div className="box box_blog_view_body">
+      <div className="head">
+        <p>Review Blog Body</p>
+        <Button onListen={close} title="close" />
+      </div>
+      <div className="body" dangerouslySetInnerHTML={{ __html: data }}></div>
+    </div>
+  );
+};
+
+export {
+  BoxView,
+  BoxViewList,
+  BoxList,
+  BoxViewListCategoryAndPartner,
+  BoxAddCategoryAndPartner,
+  BoxEditProduct,
+  BoxViewEditProduct,
+  BoxAddProduct,
+  BoxAddBlog,
+  BoxViewBlog,
+  BoxViewBlogBody,
+};

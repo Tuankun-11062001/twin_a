@@ -3,10 +3,22 @@ import MainLayout from "../layout/mainLayout";
 import { useNavigate } from "react-router-dom";
 import Loading from "../pages/loading";
 import Breadcrumb from "../components/breadcrumb";
-import Box from "../components/box";
-import { actions, useProviderCategory } from "../providers";
-import axios from "axios";
+import { BoxList, BoxView, BoxViewList } from "../components/box";
+import {
+  actions,
+  useProviderBlog,
+  useProviderCategory,
+  useProviderPartner,
+  useProviderProduct,
+} from "../providers";
 import { getAllCategories } from "../api/categoryAPI";
+import { getAllPartners } from "../api/partnerAPI";
+import { getAllProduct } from "../api/productAPI";
+import { enumVisitor } from "../enum/visitor";
+import { enumBlog } from "../enum/blog";
+import { enumProduct } from "../enum/product";
+import { enumMoney } from "../enum/money";
+import { getAllBlog } from "../api/blogAPI";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -16,12 +28,29 @@ const Home = () => {
   //                    Loading data
   // =================================================================
   const [stateCategory, dispatchCategory] = useProviderCategory();
+  const [statePartner, dispatchPartner] = useProviderPartner();
+  const [stateProduct, dispatchProduct] = useProviderProduct();
+  const [stateBlog, dispatchBlog] = useProviderBlog();
+
   useEffect(() => {
-    const allCategory = async () => {
-      const categories = await getAllCategories();
-      dispatchCategory(actions.getCategories(categories));
-    };
-    allCategory();
+    (async () => {
+      if (stateCategory.categories.length < 1) {
+        const listCategory = await getAllCategories();
+        dispatchCategory(actions.getCategories(listCategory));
+      }
+      if (statePartner.partners.length < 1) {
+        const listPartner = await getAllPartners();
+        dispatchPartner(actions.getPartners(listPartner));
+      }
+      if (stateProduct.products.length < 1) {
+        const listProduct = await getAllProduct();
+        dispatchProduct(actions.getProducts(listProduct));
+      }
+      if (stateBlog.blogs.length < 1) {
+        const listProduct = await getAllBlog();
+        dispatchBlog(actions.getBlogs(listProduct));
+      }
+    })();
   }, []);
 
   // =================================================================
@@ -35,159 +64,104 @@ const Home = () => {
     setLoading(false);
   }, []);
 
+  // =================================================================
+  //                    Check View list & view APP
+  // =================================================================
+
   const dataViewVisistor = {
-    title: "Total views today",
-    view: "30k",
-    svg: "view",
+    title: enumVisitor.viewApp.title,
+    view: enumVisitor.viewApp.view,
+    svg: enumVisitor.viewApp.svg,
   };
 
   const dataViewListBlog = {
-    title: "Total Views Blog Today",
-    view: "30k",
-    svg: "view",
-    dataSelect: [
-      {
-        title: "all",
-        value: "all",
-      },
-      {
-        title: "high",
-        value: "high",
-      },
-    ],
-    dataList: [
-      {
-        title: "How to make navigation 3d UI",
-        view: "300",
-      },
-      {
-        title: "How to make navigation 3d UI",
-        view: "300",
-      },
-    ],
+    title: enumBlog.viewList.title,
+    view: enumBlog.viewList.view,
+    svg: enumBlog.viewList.svg,
+    selects: enumBlog.viewList.selects,
+    dataTable: {
+      type: enumBlog.viewList.table.type,
+      dataTableTitle: enumBlog.viewList.table.titles,
+      dataList: [
+        {
+          title: "How to make navigation 3d UI",
+          view: "300",
+        },
+        {
+          title: "How to make navigation 3d UI",
+          view: "300",
+        },
+      ],
+    },
   };
 
   const dataViewListProduct = {
-    title: "Total Views Product Today",
-    view: "30k",
-    svg: "view",
-    dataSelect: [
-      {
-        title: "all",
-        value: "all",
-      },
-      {
-        title: "high",
-        value: "high",
-      },
-    ],
-    dataList: [
-      {
-        title: "How to make navigation 3d UI",
-        code: "Pe01",
-        view: "300",
-      },
-      {
-        title: "How to make navigation 3d UI",
-        code: "Pe01",
-        view: "300",
-      },
-    ],
+    title: enumProduct.viewList.title,
+    view: enumProduct.viewList.view,
+    svg: enumProduct.viewList.svg,
+    dataTable: {
+      type: enumProduct.viewList.table.type,
+      dataTableTitle: enumProduct.viewList.table.titles,
+      dataList: stateProduct.products,
+    },
+    selects: enumProduct.viewList.selects,
   };
 
-  // view list
-  const dataViewSelect = [
-    {
-      title: "view high",
-      value: "high",
-    },
-    {
-      title: "view newlates",
-      value: "newlatest",
-    },
-  ];
+  // =================================================================
+  //                    Check View list product
+  // =================================================================
 
-  const titleTableProduct = [
-    "Stt",
-    "Code",
-    "Title",
-    "Partner",
-    "Prices",
-    "Views",
-    "Buy click",
-  ];
-
-  const dataViewProduct = [
-    {
-      code: "123",
-      title: "How to make UI navigation",
-      partner: "Printify",
-      price: "1000",
-      views: "1000",
-      buy: "1000",
-    },
-    {
-      code: "123",
-      title: "How to make UI navigation",
-      partner: "Printify",
-      price: "1000",
-      views: "1000",
-      buy: "1000",
-    },
-  ];
-
-  const navigateDetailProduct = (item) => {
-    navigate(`/product/${item.code}`, { state: item.code });
+  const navigateDetail = (item) => {
+    navigate(`/product/${item.code}`, { state: item._id });
   };
 
   const dataListProduct = {
-    svg: "product",
-    title: "List products",
+    svg: enumProduct.listShort.svg,
+    title: enumProduct.listShort.title,
     total: 20,
-    dataViewSelect,
-    dataView: dataViewProduct,
-    titleTable: titleTableProduct,
-    navigateDetailProduct,
+    selects: enumProduct.listShort.selects,
+    type: enumProduct.listShort.type,
+    dataTable: {
+      type: enumProduct.listShort.table.type,
+      titles: enumProduct.listShort.table.titles,
+      dataView: stateProduct.products,
+      navigateDetail,
+    },
   };
 
   // dât view money product
 
   const dataViewMoneyProduct = {
-    svg: "$",
-    title: "Money earn product",
+    svg: enumMoney.product.svg,
+    title: enumMoney.product.title,
     money: 200,
   };
 
-  // data list blog
+  // =================================================================
+  //                    Check View list blog
+  // =================================================================
 
-  const titleTableBlog = ["Stt", "Title", "Views", "click source"];
-
-  const dataViewBlog = [
-    {
-      title: "How to make UI navigation",
-      view: "123",
-      source: "Printify",
-    },
-    {
-      title: "How to make UI navigation",
-      view: "123",
-      source: "Printify",
-    },
-  ];
+  const navigateDetailBlog = (item) => {
+    navigate(`/blog/${item.title}`, { state: item._id });
+  };
 
   const dataListBlog = {
-    svg: "blog",
-    title: "List Blog",
-    total: 20,
-    dataViewSelect,
-    dataView: dataViewBlog,
-    titleTable: titleTableBlog,
+    svg: enumBlog.listShort.svg,
+    title: enumBlog.listShort.title,
+    total: stateBlog.blogs.length,
+    selects: enumBlog.listShort.selects,
+    dataTable: {
+      type: enumBlog.listShort.table.type,
+      titles: enumBlog.listShort.table.titles,
+      dataView: stateBlog.blogs,
+      navigateDetail: navigateDetailBlog,
+    },
   };
 
   // data blog money
   const dataViewMoneyBlog = {
-    svg: "$",
-    title: "Money earn product",
+    svg: enumMoney.blog.svg,
+    title: enumMoney.blog.title,
     money: 200,
   };
 
@@ -197,27 +171,19 @@ const Home = () => {
         <Loading />
       ) : (
         <MainLayout>
-          <Breadcrumb type="breadcrumbDashboard" title="Dashboard" />
+          <Breadcrumb data={{ title: "DashBoard" }} />
           <div className="dashboard dashboard_view">
-            <Box type="view" data={dataViewVisistor} classname="box box_view" />
-            <Box type="viewListToday" data={dataViewListBlog} />
-            <Box type="viewListToday" data={dataViewListProduct} />
+            <BoxView data={dataViewVisistor} classname="box box_view_small" />
+            <BoxViewList data={dataViewListBlog} />
+            <BoxViewList data={dataViewListProduct} />
           </div>
           <div className="dashboard dashboard_product">
-            <Box type="viewList" data={dataListProduct} />
-            <Box
-              type="view"
-              data={dataViewMoneyProduct}
-              classname="box box_view"
-            />
+            <BoxList data={dataListProduct} />
+            <BoxView data={dataViewMoneyProduct} classname="box box_view" />
           </div>
           <div className="dashboard dashboard_blog">
-            <Box type="viewList" data={dataListBlog} />
-            <Box
-              type="view"
-              data={dataViewMoneyBlog}
-              classname="box box_view"
-            />
+            <BoxList data={dataListBlog} />
+            <BoxView data={dataViewMoneyBlog} classname="box box_view" />
           </div>
         </MainLayout>
       )}

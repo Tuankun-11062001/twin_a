@@ -3,6 +3,8 @@ import {
   ContextNotification,
   ContextProduct,
   ContextCategory,
+  ContextPartner,
+  ContextBlog,
 } from "./context";
 
 export const useProviderNotification = () => {
@@ -19,4 +21,14 @@ export const useProviderProduct = () => {
 export const useProviderCategory = () => {
   const [stateCategory, dispatchCategory] = useContext(ContextCategory);
   return [stateCategory, dispatchCategory];
+};
+
+export const useProviderPartner = () => {
+  const [statePartner, dispatchPartner] = useContext(ContextPartner);
+  return [statePartner, dispatchPartner];
+};
+
+export const useProviderBlog = () => {
+  const [stateBlog, dispatchBlog] = useContext(ContextBlog);
+  return [stateBlog, dispatchBlog];
 };

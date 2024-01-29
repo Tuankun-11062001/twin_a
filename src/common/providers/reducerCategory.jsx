@@ -1,4 +1,4 @@
-import { CREATE_CATEGORY, GET_CATEGORIES } from "./constants";
+import { CREATE_CATEGORY, GET_CATEGORIES, DELETE_CATEGORY } from "./constants";
 
 const initStateCategory = {
   categories: [],
@@ -15,6 +15,11 @@ const reducerCategory = (state, action) => {
       return {
         ...state,
         categories: [...state.categories, action.payload],
+      };
+    case DELETE_CATEGORY:
+      return {
+        ...state,
+        categories: action.payload,
       };
     default:
       return state;

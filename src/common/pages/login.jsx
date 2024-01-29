@@ -4,6 +4,7 @@ import Input from "../components/widget/input";
 import Button from "../components/widget/button";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../localData/auth";
+import { login } from "../api/userAPI";
 
 const Login = () => {
   console.log(auth);
@@ -11,7 +12,7 @@ const Login = () => {
   const [dataForm, setDataForm] = useState({
     email: "",
     password: "",
-    secretPassword: "",
+    secretCode: "",
   });
 
   const [errorForm, setErrorForm] = useState("");
@@ -25,12 +26,12 @@ const Login = () => {
     setErrorForm("");
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     // check field empty
     if (
       dataForm.email === "" ||
       dataForm.password === "" ||
-      dataForm.secretPassword === ""
+      dataForm.secretCode === ""
     ) {
       setErrorForm("Please fill all fields");
       return;
@@ -42,20 +43,15 @@ const Login = () => {
       return;
     }
 
-    const user = auth.find((u) => u.email === dataForm.email);
+    const user = await login(dataForm);
 
-    if (!user) {
-      setErrorForm("user not exist");
+    if (user?.status === 400) {
+      setErrorForm(user.message);
       return;
     }
 
-    if (user.password !== dataForm.password) {
-      setErrorForm("passowd or secret password incorrect");
-      return;
-    }
-    const token = Math.random();
+    const token = user.email;
     localStorage.setItem("token", JSON.stringify(token));
-
     navigate("/");
   };
   return (
@@ -94,8 +90,8 @@ const Login = () => {
               placeholder="Your Secret Password..."
               classname="input input_login"
               type="password"
-              name="secretPassword"
-              value={dataForm.secretPassword}
+              name="secretCode"
+              value={dataForm.secretCode}
               onListen={handleChange}
             />
           </div>

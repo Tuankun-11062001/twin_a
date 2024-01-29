@@ -1,0 +1,9 @@
+.blog {
+  &_head {
+    @include dynamicAlign($justify: space-between);
+    margin-bottom: $margin * 2;
+  }
+  &_add {
+    @include dynamicAlign();
+  }
+}

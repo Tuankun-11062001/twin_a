@@ -1,7 +1,15 @@
 import {
+  CREATE_BLOG,
   CREATE_CATEGORY,
+  CREATE_PARTNER,
+  CREATE_PRODUCT,
+  DELETE_BLOG,
+  DELETE_CATEGORY,
+  DELETE_PARTNER,
+  GET_BLOGS,
   GET_CATEGORIES,
-  ON_CHANGE_PRODUCT,
+  GET_PARTNERS,
+  GET_PRODUCTS,
   SET_NOTIFICATION_ADD,
   SET_NOTIFICATION_DELETE,
 } from "./constants";
@@ -28,9 +36,16 @@ export const setNotificationDelete = (payload) => {
 //                    Action Product
 //  =================================================================
 
-export const onChangeProduct = (payload) => {
+export const getProducts = (payload) => {
   return {
-    type: ON_CHANGE_PRODUCT,
+    type: GET_PRODUCTS,
+    payload,
+  };
+};
+
+export const createProduct = (payload) => {
+  return {
+    type: CREATE_PRODUCT,
     payload,
   };
 };
@@ -48,6 +63,61 @@ export const getCategories = (payload) => {
 export const createCategory = (payload) => {
   return {
     type: CREATE_CATEGORY,
+    payload,
+  };
+};
+
+export const deleteCategory = (payload) => {
+  return {
+    type: DELETE_CATEGORY,
+    payload,
+  };
+};
+
+// =================================================================
+//                    Action partner
+//  =================================================================
+
+export const getPartners = (payload) => {
+  return {
+    type: GET_PARTNERS,
+    payload,
+  };
+};
+export const createPartner = (payload) => {
+  return {
+    type: CREATE_PARTNER,
+    payload,
+  };
+};
+
+export const deletePartner = (payload) => {
+  return {
+    type: DELETE_PARTNER,
+    payload,
+  };
+};
+
+// =================================================================
+//                    Action blog
+//  =================================================================
+
+export const getBlogs = (payload) => {
+  return {
+    type: GET_BLOGS,
+    payload,
+  };
+};
+export const createBlog = (payload) => {
+  return {
+    type: CREATE_BLOG,
+    payload,
+  };
+};
+
+export const deleteBlog = (payload) => {
+  return {
+    type: DELETE_BLOG,
     payload,
   };
 };

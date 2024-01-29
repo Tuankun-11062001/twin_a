@@ -5,35 +5,34 @@ import {
   BoxAddCategoryAndPartner,
   BoxView,
 } from "../../../common/components/box";
-import { createCategory } from "../../../common/api/categoryAPI";
 import {
   actions,
-  useProviderCategory,
   useProviderNotification,
+  useProviderPartner,
 } from "../../../common/providers";
 import Notification from "../../../common/components/notification";
 import { useNavigate } from "react-router-dom";
+import { createPartner } from "../../../common/api/partnerAPI";
 
-const AddCategory = () => {
+const AddPartner = () => {
   const navigate = useNavigate();
-  const [stateCategory, dispatchCategory] = useProviderCategory();
+  const [statePartner, dispatchPartner] = useProviderPartner();
   const [stateNotification, dispatchNotification] = useProviderNotification();
 
-  const [dataCategory, setDataCategory] = useState({
-    categoryCode: "",
+  const [dataPartner, setDataPartner] = useState({
     title: "",
     description: "",
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setDataCategory({ ...dataCategory, [name]: value });
+    setDataPartner({ ...dataPartner, [name]: value });
   };
 
   const handleSubmit = async () => {
     try {
-      const newCategory = await createCategory(dataCategory);
-      dispatchCategory(actions.createCategory(newCategory));
+      const newPartner = await createPartner(dataPartner);
+      dispatchPartner(actions.createPartner(newPartner));
       dispatchNotification(actions.setNotificationAdd(true));
     } catch (error) {
       console.log("can't create category", error);
@@ -46,18 +45,6 @@ const AddCategory = () => {
   };
 
   const data = {
-    type: "category",
-
-    formGroupCategoryCode: {
-      type: "normal",
-      classnameFormGroup: "form_group",
-      lable: "Code Category",
-      inputClassname: "input input_form_group",
-      inputListen: handleChange,
-      inputName: "categoryCode",
-      inputValue: dataCategory.categoryCode,
-    },
-
     formGroupCategoryTitle: {
       type: "normal",
       classnameFormGroup: "form_group",
@@ -65,7 +52,7 @@ const AddCategory = () => {
       inputClassname: "input input_form_group",
       inputListen: handleChange,
       inputName: "title",
-      inputValue: dataCategory.title,
+      inputValue: dataPartner.title,
     },
 
     formGroupCategoryDescription: {
@@ -76,7 +63,7 @@ const AddCategory = () => {
       inputClassname: "input input_form_group",
       inputListen: handleChange,
       inputName: "description",
-      inputValue: dataCategory.description,
+      inputValue: dataPartner.description,
     },
 
     handleCreate: handleSubmit,
@@ -85,17 +72,16 @@ const AddCategory = () => {
   const dataViewTotalCategory = {
     title: "Total Category",
     svg: "view",
-    view: stateCategory.categories?.length,
+    view: statePartner.partners?.length,
   };
 
   const dataTotalProduct = {
     title: "Total Product",
     svg: "view",
   };
-  console.log(stateNotification);
 
-  const addCategoryBreadcrumb = {
-    title: "Add Category",
+  const addPartnerBreadcrumb = {
+    title: "Create Partner",
     buttonBack: {
       onListen: () => navigate(-1),
     },
@@ -103,7 +89,7 @@ const AddCategory = () => {
 
   return (
     <MainLayout>
-      <Breadcrumb data={addCategoryBreadcrumb} />
+      <Breadcrumb data={addPartnerBreadcrumb} />
       <div className="category category_add">
         <BoxAddCategoryAndPartner data={data} />
         <BoxView data={dataViewTotalCategory} classname="box box_view_small" />
@@ -116,4 +102,4 @@ const AddCategory = () => {
   );
 };
 
-export default AddCategory;
+export default AddPartner;

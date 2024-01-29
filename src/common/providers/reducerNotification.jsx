@@ -2,8 +2,8 @@ import { SET_NOTIFICATION_ADD, SET_NOTIFICATION_DELETE } from "./constants";
 
 const initStateNotification = {
   notification: {
-    addProduct: false,
-    deleteProduct: false,
+    add: false,
+    delete: false,
   },
 };
 
@@ -14,7 +14,7 @@ const reducerNotification = (state, action) => {
         ...state,
         notification: {
           ...state.notification,
-          addProduct: action.payload,
+          add: action.payload,
         },
       };
     case SET_NOTIFICATION_DELETE:
@@ -22,7 +22,7 @@ const reducerNotification = (state, action) => {
         ...state,
         notification: {
           ...state.notification,
-          deleteProduct: action.payload,
+          delete: action.payload,
         },
       };
     default:

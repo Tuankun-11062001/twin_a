@@ -4,5 +4,12 @@ const ContextNotification = createContext();
 const ContextProduct = createContext();
 const ContextBlog = createContext();
 const ContextCategory = createContext();
+const ContextPartner = createContext();
 
-export { ContextNotification, ContextProduct, ContextBlog, ContextCategory };
+export {
+  ContextNotification,
+  ContextProduct,
+  ContextBlog,
+  ContextCategory,
+  ContextPartner,
+};

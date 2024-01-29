@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import MainLayout from "../../../common/layout/mainLayout";
 import Breadcrumb from "../../../common/components/breadcrumb";
 import {
@@ -8,33 +8,34 @@ import {
 } from "../../../common/components/box";
 import {
   actions,
-  useProviderCategory,
   useProviderNotification,
+  useProviderPartner,
   useProviderProduct,
 } from "../../../common/providers";
-import {
-  deleteCategory,
-  getAllCategories,
-} from "../../../common/api/categoryAPI";
 import Notification from "../../../common/components/notification";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  getAllPartners,
+  deletePartner as deletePartnerAPI,
+} from "../../../common/api/partnerAPI";
+import { deletePartner } from "../../../common/providers/actions";
 import { enumProduct } from "../../../common/enum/product";
 import { getAllProduct } from "../../../common/api/productAPI";
-import { enumCategory } from "../../../common/enum/category";
+import { enumNotification } from "../../../common/enum/notification";
 
-const Category = () => {
+const Partner = () => {
   const navigate = useNavigate();
-  const [stateCategory, dispatchCategory] = useProviderCategory();
   const [stateNotification, dispatchNotification] = useProviderNotification();
+  const [statePartner, dispatchPartner] = useProviderPartner();
   const [stateProduct, dispatchProduct] = useProviderProduct();
   const [stateDataDelete, setStateDataDelete] = useState({});
 
   useEffect(() => {
     (async () => {
-      if (stateCategory.categories.length < 1) {
-        const listCategory = await getAllCategories();
-        dispatchCategory(actions.getCategories(listCategory));
+      if (statePartner.partners.length < 1) {
+        const listPartners = await getAllPartners();
+        dispatchPartner(actions.getPartners(listPartners));
       }
       if (stateProduct.products.length < 1) {
         const listProduct = await getAllProduct();
@@ -44,18 +45,18 @@ const Category = () => {
   }, []);
 
   const dataTotalCategory = {
-    title: enumCategory.titleTotal,
-    svg: enumCategory.svg,
-    view: stateCategory.categories?.length,
+    title: "Total Partners",
+    svg: "product",
+    view: statePartner.partners?.length,
   };
   const dataTotalProduct = {
-    title: enumProduct.titleTotal,
-    svg: enumProduct.svg,
-    view: stateProduct.products.length,
+    title: "Total product",
+    svg: "product",
+    view: "50",
   };
 
   const navigateDetail = (item) => {
-    navigate(`/product/${item.code}`, { state: item._id });
+    navigate(`/product/${item._id}`, { state: item._id });
   };
 
   const dataProduct = {
@@ -73,7 +74,7 @@ const Category = () => {
   };
 
   // =================================================================
-  //                      List categories
+  //                      List partner
   // =================================================================
 
   const handleDelete = async (dataCategory) => {
@@ -82,52 +83,51 @@ const Category = () => {
   };
 
   const handleYesDelete = async () => {
-    const newListCategory = await deleteCategory(stateDataDelete._id);
-    dispatchCategory(actions.deleteCategory(newListCategory));
+    const newListPartner = await deletePartnerAPI(stateDataDelete._id);
+    dispatchPartner(actions.deletePartner(newListPartner));
     dispatchNotification(actions.setNotificationDelete(false));
   };
 
   const handleView = () => {};
 
   const data = {
-    type: enumCategory.viewAll.type,
-    title: enumCategory.viewAll.title,
-    list: stateCategory.categories,
+    list: statePartner.partners,
+    title: "Partners",
     handleDelete,
     handleView,
   };
 
   const dataNotification = {
-    title: "Notification",
+    title: enumNotification.partner.title,
     code: stateDataDelete._id,
-    body: "Are you sure you want to delete this category",
+    body: enumNotification.partner.body,
     handleYesDelete,
   };
 
-  const categoryBreadcrumb = {
+  const partnerBreadcrumbs = {
+    title: "Partner",
     buttonBack: {
       onListen: () => navigate(-1),
     },
-    title: "Product Category",
     buttons: [
       {
-        title: "Add Category",
+        title: "Add Partner",
         classname: "button button_category",
-        onListen: () => navigate("/product/category/add"),
+        onListen: () => navigate("/product/partner/add"),
       },
     ],
   };
 
   return (
     <MainLayout>
-      <Breadcrumb data={categoryBreadcrumb} />
+      <Breadcrumb data={partnerBreadcrumbs} />
       <div className="category">
         <div className="category_head">
           <BoxViewListCategoryAndPartner data={data} />
           <BoxView data={dataTotalCategory} classname="box box_view_small" />
           <BoxView data={dataTotalProduct} classname="box box_view_small" />
         </div>
-        <BoxList type="viewList" data={dataProduct} />
+        <BoxList data={dataProduct} />
       </div>
       {stateNotification.notification.delete && (
         <Notification type="delete" data={dataNotification} />
@@ -136,4 +136,4 @@ const Category = () => {
   );
 };
 
-export default Category;
+export default Partner;

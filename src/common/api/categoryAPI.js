@@ -22,3 +22,14 @@ export const createCategory = async (payload) => {
     console.log("Can't create category", error);
   }
 };
+
+export const deleteCategory = async (payload) => {
+  try {
+    const category = await axios.delete(
+      `${import.meta.env.VITE_TWIN_API}/category/delete/${payload}`
+    );
+    return category.data.data;
+  } catch (error) {
+    console.log("Can't delete category", error);
+  }
+};

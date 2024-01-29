@@ -5,7 +5,7 @@
   padding: $padding;
   border-radius: $border_radius;
   &_view {
-    flex: 0.6;
+    width: 55rem;
     div:first-child {
       @include dynamicAlign($align: center);
     }
@@ -13,7 +13,7 @@
       font-size: $font_size + 1rem;
     }
     &_small {
-      flex: 0.3;
+      width: 30rem;
     }
   }
 
@@ -91,6 +91,11 @@
         p:first-child {
           color: $color_gray;
         }
+        p:last-child {
+          width: 10rem;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
       }
     }
     &_colors {
@@ -137,6 +142,59 @@
       div {
         @include dynamicAlign();
       }
+    }
+  }
+
+  &_add_category {
+    flex: 1;
+  }
+
+  &_blog_view_card {
+    width: 50rem;
+    @include dynamicAlign(center, center, $direction: column);
+
+    .head {
+      @include dynamicAlign($align: center);
+      width: $width_full;
+      p {
+        color: $color_gray;
+      }
+    }
+
+    .body {
+      width: 35rem;
+      border-radius: $border_radius;
+      overflow: hidden;
+      background: $color_milk;
+      img {
+        width: $width_full;
+        height: 20rem;
+        background: pink;
+        object-fit: cover;
+      }
+      .content {
+        padding: $padding;
+      }
+      span {
+        font-size: $font_size - 0.2rem;
+        color: $color_gray;
+      }
+      h3 {
+        font-size: $font_size;
+      }
+      p {
+        font-size: $font_size - 0.1rem;
+      }
+    }
+  }
+
+  &_blog_view_body {
+    img {
+      width: 50%;
+      position: relative;
+      left: 50%;
+      transform: translateX(-50%);
+      margin: 2rem 0;
     }
   }
 }

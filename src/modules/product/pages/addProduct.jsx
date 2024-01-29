@@ -1,78 +1,75 @@
 import React, { useEffect, useState } from "react";
 import MainLayout from "../../../common/layout/mainLayout";
 import Breadcrumb from "../../../common/components/breadcrumb";
-import Box from "../../../common/components/box";
+import {
+  BoxAddProduct,
+  BoxView,
+  BoxViewEditProduct,
+} from "../../../common/components/box";
 import Notification from "../../../common/components/notification";
 import {
   actions,
   useProviderCategory,
   useProviderNotification,
+  useProviderPartner,
+  useProviderProduct,
 } from "../../../common/providers";
 import { getAllCategories } from "../../../common/api/categoryAPI";
+import { useNavigate } from "react-router-dom";
+import { getAllPartners } from "../../../common/api/partnerAPI";
+import { createProduct } from "../../../common/api/productAPI";
+import { enumPublish } from "../../../common/enum/publish";
 
 const AddProduct = () => {
+  const navigate = useNavigate();
   const [stateCategory, dispatchCategory] = useProviderCategory();
+  const [statePartner, dispatchPartner] = useProviderPartner();
+  const [stateProduct, dispatchProduct] = useProviderProduct();
   const [stateNotification, dispatchNotification] = useProviderNotification();
   //  =================================================================
   //                          Loading category
   //  =================================================================
-  useState(() => {
+
+  useEffect(() => {
     (async () => {
-      if (stateCategory.categories) {
-        const getCategories = await getAllCategories();
-        return dispatchCategory(actions.getCategories(getCategories));
+      if (statePartner.partners.length < 1) {
+        const getPartners = await getAllPartners();
+        dispatchPartner(actions.getPartners(getPartners));
       }
+      if (stateCategory.categories.length < 1) {
+        const getCategories = await getAllCategories();
+        dispatchCategory(actions.getCategories(getCategories));
+      }
+      return;
     })();
   }, []);
 
   const [dataProduct, setDataProduct] = useState({
-    publish: "",
+    publish: true,
     code: "",
     title: "",
     currentImage: "",
     image: [],
     category: "",
     partner: "",
-    price: 0,
-    views: 0,
-    profit: 0,
-    buy: 0,
+    price: "",
+    profit: "",
     description: "",
   });
 
   const [isOneColor, setIsAddOneColor] = useState(false);
-
-  const dataSelectPublish = [
-    {
-      title: "Publish",
-      value: "publish",
-    },
-    {
-      title: "Unpublish",
-      value: "unpublish",
-    },
-  ];
-
-  const dataParnerSelect = [
-    { title: "none", value: "none" },
-    { title: "Printify", value: "printify" },
-    { title: "Printub", value: "printub" },
-  ];
 
   const onListenAddOne = () => {
     setIsAddOneColor(!isOneColor);
   };
 
   const onListenAddOneColor = (data) => {
-    console.log("image add", data);
     setDataProduct((prev) => {
       return {
         ...prev,
         image: [...prev.image, data],
       };
     });
-
-    console.log(dataProduct);
   };
 
   const formListen = (e) => {
@@ -103,9 +100,12 @@ const AddProduct = () => {
     }));
   };
 
-  const onListenSave = () => {
-    console.log(dataProduct);
-    dispatch(actions.setNotificationAdd(true));
+  const onListenCreate = async () => {
+    const product = await createProduct(dataProduct);
+    if (product) {
+      dispatchProduct(actions.createProduct(product));
+      dispatchNotification(actions.setNotificationAdd(true));
+    }
   };
 
   const data = {
@@ -118,7 +118,7 @@ const AddProduct = () => {
       onListen: formListen,
       value: dataProduct.publish,
       classname: "select select_publish",
-      data: dataSelectPublish,
+      data: enumPublish.selects,
     },
 
     //  =================================================================
@@ -178,7 +178,7 @@ const AddProduct = () => {
       type: "select",
       classnameFormGroup: "form_group",
       lable: "Category",
-      dataSelect: stateCategory.categories,
+      dataSelect: stateCategory?.categories || [],
       classnameSelect: "select select_edit_product",
       inputValue: dataProduct.category,
       inputName: "category",
@@ -207,7 +207,7 @@ const AddProduct = () => {
       type: "select",
       classnameFormGroup: "form_group",
       lable: "Partner",
-      dataSelect: dataParnerSelect,
+      dataSelect: statePartner.partners,
       classnameSelect: "select select_edit_product",
       inputValue: dataProduct.partner,
       inputName: "partner",
@@ -242,6 +242,7 @@ const AddProduct = () => {
       inputValue: dataProduct.description,
       classnameArea: "area",
     },
+    onListenCreate,
   };
 
   const dataViewEdit = {
@@ -249,27 +250,36 @@ const AddProduct = () => {
     onChangeColor,
   };
 
+  const addProductBreadcrumb = {
+    buttonBack: {
+      onListen: () => navigate(-1),
+    },
+    title: "Create product",
+    param: dataProduct.code,
+  };
+
+  const dataNotification = {
+    title: "Notification",
+    body: "Product created successfully",
+  };
+
   return (
     <MainLayout>
-      <Breadcrumb
-        type="breadcrumbProductAddd"
-        title="Create Product"
-        codeID={dataProduct.code}
-      />
+      <Breadcrumb data={addProductBreadcrumb} />
       <div className="product product_detail_page">
         <div className="product_detail_page_left">
-          <Box type="addProduct" data={data} />
+          <BoxAddProduct type="addProduct" data={data} />
         </div>
         <div className="product_detail_page_right">
-          <Box type="viewEditProduct" data={dataViewEdit} />
+          <BoxViewEditProduct type="viewEditProduct" data={dataViewEdit} />
           <div className="product_detail_page_right_bottom">
-            <Box type="productTotal" />
-            <Box type="totalCategory" />
+            {/* <BoxView />
+            <BoxView /> */}
           </div>
         </div>
       </div>
-      {stateNotification.notification.addProduct && (
-        <Notification type="addProduct" />
+      {stateNotification.notification.add && (
+        <Notification type="add" data={dataNotification} />
       )}
     </MainLayout>
   );

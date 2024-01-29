@@ -4,6 +4,8 @@ import {
   ContextNotification,
   ContextProduct,
   ContextCategory,
+  ContextPartner,
+  ContextBlog,
 } from "./context";
 import reducerNotification, {
   initStateNotification,
@@ -11,6 +13,8 @@ import reducerNotification, {
 import reducerProduct, { stateInitProduct } from "./reducerProduct";
 import reducerCategory, { initStateCategory } from "./reducerCategory";
 import logger from "./logger";
+import reducerPartner, { initStatePartner } from "./reducerPartner";
+import reducerBlog, { stateInitBlog } from "./reducerBlog";
 const AppProvider = () => {
   const [stateNotification, dispatchNotification] = useReducer(
     logger(reducerNotification),
@@ -27,14 +31,28 @@ const AppProvider = () => {
     initStateCategory
   );
 
+  const [statePartner, dispatchPartner] = useReducer(
+    logger(reducerPartner),
+    initStatePartner
+  );
+
+  const [stateBlog, dispatchBlog] = useReducer(
+    logger(reducerBlog),
+    stateInitBlog
+  );
+
   return (
     <ContextNotification.Provider
       value={[stateNotification, dispatchNotification]}
     >
       <ContextCategory.Provider value={[stateCategory, dispatchCategory]}>
-        <ContextProduct.Provider value={[stateProduct, dispatchProduct]}>
-          <MainRouter />
-        </ContextProduct.Provider>
+        <ContextBlog.Provider value={[stateBlog, dispatchBlog]}>
+          <ContextPartner.Provider value={[statePartner, dispatchPartner]}>
+            <ContextProduct.Provider value={[stateProduct, dispatchProduct]}>
+              <MainRouter />
+            </ContextProduct.Provider>
+          </ContextPartner.Provider>
+        </ContextBlog.Provider>
       </ContextCategory.Provider>
     </ContextNotification.Provider>
   );

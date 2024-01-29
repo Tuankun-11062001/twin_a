@@ -1,4 +1,10 @@
 .table {
+  &_view_list {
+    width: $width_full;
+    td {
+      text-align: center;
+    }
+  }
   &_list {
     width: $width_full;
     text-align: center;
@@ -7,6 +13,21 @@
       &:hover {
         color: $color_gray;
       }
+    }
+  }
+  &_full_blog {
+    td:fisrt-child {
+      width: 2rem;
+    }
+    td:nth-child(2) {
+      width: 30rem;
+    }
+    td:nth-child(3) {
+      width: 25rem;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 1;
     }
   }
 }

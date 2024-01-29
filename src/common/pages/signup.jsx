@@ -5,6 +5,7 @@ import Button from "../components/widget/button";
 import { Link } from "react-router-dom";
 import { auth } from "../localData/auth";
 import Notification from "../components/notification";
+import { signup } from "../api/userAPI";
 
 const Signup = () => {
   const [dataForm, setDataForm] = useState({
@@ -25,7 +26,7 @@ const Signup = () => {
     setErrorForm("");
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     // check field empty
     if (
       dataForm.email === "" ||
@@ -48,11 +49,11 @@ const Signup = () => {
       return;
     }
 
-    // add secret password
-    const newData = { ...dataForm, secretPassword: dataForm.password };
+    const user = await signup(dataForm);
 
-    auth.push(newData);
-    setNotification(true);
+    if (user) {
+      setNotification(true);
+    }
   };
   return (
     <div className="layout layout_signup signup">

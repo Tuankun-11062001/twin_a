@@ -2,20 +2,19 @@ import React from "react";
 import { Link } from "react-router-dom";
 import Button from "./widget/button";
 import { actions, useProviderNotification } from "../providers";
+import { data } from "./chart";
 
-const Notification = ({ type, idCode, onListenNo }) => {
+const Notification = ({ type, data }) => {
   const matchNotifications = () => {
     switch (type) {
       case "signup":
         return <NotificationSignup />;
       case "forgotPassword":
         return <NotificationForgotPassword />;
-      case "addProduct":
-        return <NotificationAddProduct />;
-      case "deleteProduct":
-        return (
-          <NotificationDeleteProduct idCode={idCode} onListenNo={onListenNo} />
-        );
+      case "add":
+        return <NotificationAdd data={data} />;
+      case "delete":
+        return <NotificationDelete data={data} />;
       default:
         return "";
     }
@@ -49,15 +48,15 @@ const NotificationForgotPassword = () => {
   );
 };
 
-const NotificationAddProduct = () => {
+const NotificationAdd = ({ data }) => {
   const [state, dispatch] = useProviderNotification();
   const onListenCloseNotification = () => {
     dispatch(actions.setNotificationAdd(false));
   };
   return (
     <div className="notification_add_product">
-      <h2>Notification</h2>
-      <p>Add one product successfull!</p>
+      <h2>{data.title}</h2>
+      <p>{data.body}</p>
       <Button
         title="Understand"
         classname="button button_add"
@@ -67,7 +66,7 @@ const NotificationAddProduct = () => {
   );
 };
 
-const NotificationDeleteProduct = ({ idCode }) => {
+const NotificationDelete = ({ data }) => {
   const [state, dispatch] = useProviderNotification();
 
   const onListenCloseNotification = () => {
@@ -76,15 +75,15 @@ const NotificationDeleteProduct = ({ idCode }) => {
   return (
     <div className="notification_delete_product">
       <div className="head">
-        <h2>Delete product</h2>
-        <p>ID:{idCode}</p>
+        <h2>{data.title}</h2>
+        <p>{data.code}</p>
       </div>
-      <p>Are you sure to delete this product</p>
+      <p>{data.body}</p>
       <div className="foot">
         <Button
           title="Yes"
           classname="button button_yes"
-          onListen={() => console.log("yes")}
+          onListen={data.handleYesDelete}
         />
         <Button
           title="No"
