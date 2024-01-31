@@ -223,6 +223,10 @@ const BoxAddProduct = ({ data }) => {
 
       <FormGroup type={data.formGroupProfit.type} data={data.formGroupProfit} />
       <FormGroup
+        type={data.formGroupLinkProduct.type}
+        data={data.formGroupLinkProduct}
+      />
+      <FormGroup
         type={data.formGroupDescription.type}
         data={data.formGroupDescription}
       />

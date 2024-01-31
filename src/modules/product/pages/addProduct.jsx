@@ -55,6 +55,7 @@ const AddProduct = () => {
     price: "",
     profit: "",
     description: "",
+    linkProduct: "",
   });
 
   const [isOneColor, setIsAddOneColor] = useState(false);
@@ -226,6 +227,19 @@ const AddProduct = () => {
       inputListen: formListen,
       inputName: "profit",
       inputValue: dataProduct.profit,
+    },
+    //  =================================================================
+    //                          form group link product
+    //  =================================================================
+
+    formGroupLinkProduct: {
+      type: "normal",
+      classnameFormGroup: "form_group",
+      lable: "link Product",
+      inputClassname: "input input_form_group",
+      inputListen: formListen,
+      inputName: "linkProduct",
+      inputValue: dataProduct.linkProduct,
     },
 
     //  =================================================================

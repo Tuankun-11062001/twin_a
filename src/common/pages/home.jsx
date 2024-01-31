@@ -34,19 +34,19 @@ const Home = () => {
 
   useEffect(() => {
     (async () => {
-      if (stateCategory.categories.length < 1) {
+      if (stateCategory.categories?.length < 1) {
         const listCategory = await getAllCategories();
         dispatchCategory(actions.getCategories(listCategory));
       }
-      if (statePartner.partners.length < 1) {
+      if (statePartner.partners?.length < 1) {
         const listPartner = await getAllPartners();
         dispatchPartner(actions.getPartners(listPartner));
       }
-      if (stateProduct.products.length < 1) {
+      if (stateProduct.products?.length < 1) {
         const listProduct = await getAllProduct();
         dispatchProduct(actions.getProducts(listProduct));
       }
-      if (stateBlog.blogs.length < 1) {
+      if (stateBlog.blogs?.length < 1) {
         const listProduct = await getAllBlog();
         dispatchBlog(actions.getBlogs(listProduct));
       }
@@ -148,7 +148,7 @@ const Home = () => {
   const dataListBlog = {
     svg: enumBlog.listShort.svg,
     title: enumBlog.listShort.title,
-    total: stateBlog.blogs.length,
+    total: stateBlog.blogs?.length,
     selects: enumBlog.listShort.selects,
     dataTable: {
       type: enumBlog.listShort.table.type,
@@ -174,16 +174,16 @@ const Home = () => {
           <Breadcrumb data={{ title: "DashBoard" }} />
           <div className="dashboard dashboard_view">
             <BoxView data={dataViewVisistor} classname="box box_view_small" />
-            <BoxViewList data={dataViewListBlog} />
-            <BoxViewList data={dataViewListProduct} />
+            <BoxViewList data={dataViewListBlog || []} />
+            <BoxViewList data={dataViewListProduct || []} />
           </div>
           <div className="dashboard dashboard_product">
-            <BoxList data={dataListProduct} />
+            <BoxList data={dataListProduct || []} />
             <BoxView data={dataViewMoneyProduct} classname="box box_view" />
           </div>
           <div className="dashboard dashboard_blog">
-            <BoxList data={dataListBlog} />
-            <BoxView data={dataViewMoneyBlog} classname="box box_view" />
+            <BoxList data={dataListBlog || []} />
+            <BoxView data={dataViewMoneyBlog || []} classname="box box_view" />
           </div>
         </MainLayout>
       )}
