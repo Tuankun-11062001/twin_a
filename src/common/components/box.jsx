@@ -2,10 +2,8 @@ import React from "react";
 import Select from "./widget/select";
 import Svgs from "../localData/svgs";
 import { TableFull, TableShort, TableViewList } from "./widget/table";
-import ChartLine from "./chart";
 import FormGroup from "./widget/formGroup";
 import Button from "./widget/button";
-import { useProviderCategory } from "../providers";
 import { enumProduct } from "../enum/product";
 import { enumBlog } from "../enum/blog";
 import Tiptap from "./tiptap";
@@ -42,7 +40,6 @@ const BoxView = ({ data, classname }) => {
         <p>{data.title}</p>
       </div>
       <h3>{data.view || data.money || data.total}</h3>
-      <ChartLine />
     </div>
   );
 };
@@ -138,6 +135,25 @@ const BoxEditProduct = ({ data }) => {
       />
 
       <FormGroup type={data.formGroupProfit.type} data={data.formGroupProfit} />
+
+      <FormGroup type={data.formGroupSeason.type} data={data.formGroupSeason} />
+
+      <Select
+        data={data.selectHotProduct.data}
+        classname={data.selectHotProduct.classname}
+        value={data.selectHotProduct.value}
+        onListen={data.selectHotProduct.onListen}
+        name={data.selectHotProduct.name}
+      />
+
+      <Select
+        data={data.selectSaleProduct.data}
+        classname={data.selectSaleProduct.classname}
+        value={data.selectSaleProduct.value}
+        onListen={data.selectSaleProduct.onListen}
+        name={data.selectSaleProduct.name}
+      />
+
       <FormGroup
         type={data.formGroupDescription.type}
         data={data.formGroupDescription}
@@ -162,26 +178,29 @@ const BoxViewEditProduct = ({ data }) => {
 };
 
 const BoxProduct = ({ data }) => {
+  console.log(data);
   return (
     <div className="box box_product">
-      <img src={data.dataProduct.currentImage} />
+      <img src={data.dataProduct?.currentImage} />
       <h3>{data.dataProduct.title}</h3>
       <div className="box_product_content">
         <div>
           <p>ID product</p>
           <p>{data.dataProduct.code}</p>
         </div>
-        <div>
-          <p>partner</p>
-          <p>{data.dataProduct.partner}</p>
-        </div>
+
         <div>
           <p>category</p>
           <p>{data.dataProduct.category}</p>
         </div>
+
+        <div>
+          <p>partner</p>
+          <p>{data.dataProduct.partner}</p>
+        </div>
       </div>
       <div className="box_product_colors">
-        {data.dataProduct.image.map((color, indx) => (
+        {data?.dataProduct?.image?.map((color, indx) => (
           <span
             key={indx}
             onClick={(e) => data.onChangeColor(indx, e)}
@@ -189,7 +208,7 @@ const BoxProduct = ({ data }) => {
           ></span>
         ))}
       </div>
-      <p className="box_product_price">${data.dataProduct.price}</p>
+      <p className="box_product_price">{data?.dataProduct.price}</p>
     </div>
   );
 };
@@ -226,6 +245,24 @@ const BoxAddProduct = ({ data }) => {
         type={data.formGroupLinkProduct.type}
         data={data.formGroupLinkProduct}
       />
+      <FormGroup type={data.formGroupSeason.type} data={data.formGroupSeason} />
+
+      <Select
+        data={data.selectHotProduct.data}
+        classname={data.selectHotProduct.classname}
+        value={data.selectHotProduct.value}
+        onListen={data.selectHotProduct.onListen}
+        name={data.selectHotProduct.name}
+      />
+
+      <Select
+        data={data.selectSaleProduct.data}
+        classname={data.selectSaleProduct.classname}
+        value={data.selectSaleProduct.value}
+        onListen={data.selectSaleProduct.onListen}
+        name={data.selectSaleProduct.name}
+      />
+
       <FormGroup
         type={data.formGroupDescription.type}
         data={data.formGroupDescription}
@@ -244,7 +281,7 @@ const BoxViewListCategoryAndPartner = ({ data }) => {
     <div className="box box_category">
       <h3>{data.title}</h3>
       <div className="box_category_list">
-        {data.list?.map((item, indx) => (
+        {data?.list?.map((item, indx) => (
           <div className="box_category_item" key={indx}>
             <div className="box_category_item_left">
               {data.type === "category" && <p>{item.categoryCode}</p>}

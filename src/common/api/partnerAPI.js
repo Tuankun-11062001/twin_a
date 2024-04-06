@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const getAllPartners = async () => {
+export const getAllPartnersAPI = async () => {
   try {
     const partners = await axios.get(
       `${import.meta.env.VITE_TWIN_API}/partner`
@@ -11,24 +11,28 @@ export const getAllPartners = async () => {
   }
 };
 
-export const createPartner = async (payload) => {
+export const createPartnerAPI = async (payload) => {
   try {
     const newPartner = await axios.post(
       `${import.meta.env.VITE_TWIN_API}/partner/add`,
       payload
     );
-    return newPartner.data.data;
+    // const newPartner = await axios.post(
+    //   `${import.meta.env.VITE_DEV_API}/partner/add`,
+    //   payload
+    // );
+    return newPartner.data;
   } catch (error) {
     console.log("Can't create category", error);
   }
 };
 
-export const deletePartner = async (payload) => {
+export const deletePartnerAPI = async (payload) => {
   try {
     const partner = await axios.delete(
       `${import.meta.env.VITE_TWIN_API}/partner/delete/${payload}`
     );
-    return partner.data.data;
+    return partner.data;
   } catch (error) {
     console.log("Can't delete category", error);
   }

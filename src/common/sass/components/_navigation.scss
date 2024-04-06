@@ -1,9 +1,7 @@
 .navigation {
   &_left {
-    position: fixed;
-    left: 0;
-    top: 0;
-    bottom: 0;
+    @include dynamicPosition($pos: fixed, $left: 0, $top: 0, $bottom: 0);
+
     width: 35rem;
     background: $color_white;
     margin: $margin;
@@ -39,10 +37,8 @@
     }
   }
   &_top {
-    position: fixed;
-    right: 0;
-    top: 0;
-    left: 40rem;
+    @include dynamicPosition($pos: fixed, $right: 0, $top: 0, $left: 40rem);
+
     padding: $padding * 2 $padding;
     border-radius: $border_radius;
     margin-right: 2rem;
@@ -75,16 +71,14 @@
     &_user {
       @include dynamicAlign($justify: space-between, $align: center);
       cursor: pointer;
-      position: relative;
+      @include dynamicPosition($pos: relative);
       p,
       img {
         pointer-events: none;
       }
     }
     &_box {
-      position: absolute;
-      right: -25rem;
-      top: 100%;
+      @include dynamicPosition($pos: absolute, $right: -25rem, $top: 100%);
       background: $color_black;
       color: $color_white;
       width: 20rem;

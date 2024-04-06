@@ -6,39 +6,39 @@ import {
   BoxView,
   BoxViewListCategoryAndPartner,
 } from "../../../common/components/box";
-import {
-  actions,
-  useProviderCategory,
-  useProviderNotification,
-  useProviderProduct,
-} from "../../../common/providers";
-import {
-  deleteCategory,
-  getAllCategories,
-} from "../../../common/api/categoryAPI";
-import Notification from "../../../common/components/notification";
+
+import Notification, {
+  NotificationAsk,
+} from "../../../common/components/notification";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { enumProduct } from "../../../common/enum/product";
-import { getAllProduct } from "../../../common/api/productAPI";
 import { enumCategory } from "../../../common/enum/category";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  closeMessage,
+  deleteCategoryThunk,
+  getAllCategoriesThunk,
+  notificationDelete,
+} from "../../../common/providers/slices/categorySlice";
+import { getProductsThunk } from "../../../common/providers/slices/productSlice";
 
 const Category = () => {
   const navigate = useNavigate();
-  const [stateCategory, dispatchCategory] = useProviderCategory();
-  const [stateNotification, dispatchNotification] = useProviderNotification();
-  const [stateProduct, dispatchProduct] = useProviderProduct();
-  const [stateDataDelete, setStateDataDelete] = useState({});
+  const dispatch = useDispatch();
+  const { partners } = useSelector((state) => state.partner);
+  const { categories, notification, message, idCategory } = useSelector(
+    (state) => state.category
+  );
+  const { products } = useSelector((state) => state.product);
 
   useEffect(() => {
     (async () => {
-      if (stateCategory.categories.length < 1) {
-        const listCategory = await getAllCategories();
-        dispatchCategory(actions.getCategories(listCategory));
+      if (categories.length < 1) {
+        dispatch(getAllCategoriesThunk());
       }
-      if (stateProduct.products.length < 1) {
-        const listProduct = await getAllProduct();
-        dispatchProduct(actions.getProducts(listProduct));
+      if (products.length < 1) {
+        dispatch(getProductsThunk());
       }
     })();
   }, []);
@@ -46,12 +46,12 @@ const Category = () => {
   const dataTotalCategory = {
     title: enumCategory.titleTotal,
     svg: enumCategory.svg,
-    view: stateCategory.categories?.length,
+    view: categories?.length,
   };
   const dataTotalProduct = {
     title: enumProduct.titleTotal,
     svg: enumProduct.svg,
-    view: stateProduct.products.length,
+    view: products.length,
   };
 
   const navigateDetail = (item) => {
@@ -67,7 +67,7 @@ const Category = () => {
     dataTable: {
       type: enumProduct.full.table.type,
       titles: enumProduct.full.table.titles,
-      dataView: stateProduct.products,
+      dataView: products,
       navigateDetail,
     },
   };
@@ -77,14 +77,11 @@ const Category = () => {
   // =================================================================
 
   const handleDelete = async (dataCategory) => {
-    setStateDataDelete(dataCategory);
-    dispatchNotification(actions.setNotificationDelete(true));
+    dispatch(notificationDelete(dataCategory));
   };
 
-  const handleYesDelete = async () => {
-    const newListCategory = await deleteCategory(stateDataDelete._id);
-    dispatchCategory(actions.deleteCategory(newListCategory));
-    dispatchNotification(actions.setNotificationDelete(false));
+  const handleDeleteAccept = async () => {
+    dispatch(deleteCategoryThunk(idCategory));
   };
 
   const handleView = () => {};
@@ -92,16 +89,9 @@ const Category = () => {
   const data = {
     type: enumCategory.viewAll.type,
     title: enumCategory.viewAll.title,
-    list: stateCategory.categories,
+    list: categories,
     handleDelete,
     handleView,
-  };
-
-  const dataNotification = {
-    title: "Notification",
-    code: stateDataDelete._id,
-    body: "Are you sure you want to delete this category",
-    handleYesDelete,
   };
 
   const categoryBreadcrumb = {
@@ -129,8 +119,12 @@ const Category = () => {
         </div>
         <BoxList type="viewList" data={dataProduct} />
       </div>
-      {stateNotification.notification.delete && (
-        <Notification type="delete" data={dataNotification} />
+      {notification && (
+        <NotificationAsk
+          info={message}
+          handleClose={() => dispatch(closeMessage(""))}
+          handleAccept={() => handleDeleteAccept()}
+        />
       )}
     </MainLayout>
   );

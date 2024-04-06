@@ -1,24 +1,33 @@
 import React from "react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createBlog } from "../../../common/api/blogAPI";
+import Breadcrumb from "../../../common/components/breadcrumb";
+import { enumPublish } from "../../../common/enum/publish";
+import MainLayout from "../../../common/layout/mainLayout";
 import {
   BoxAddBlog,
   BoxViewBlog,
   BoxViewBlogBody,
 } from "../../../common/components/box";
-import Breadcrumb from "../../../common/components/breadcrumb";
-import Notification from "../../../common/components/notification";
-import Tiptap from "../../../common/components/tiptap";
-import { enumPublish } from "../../../common/enum/publish";
-import MainLayout from "../../../common/layout/mainLayout";
-import { actions, useProviderNotification } from "../../../common/providers";
+import { createBlogAPI } from "../../../common/api/blogAPI";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  closeMessage,
+  createBlogThunk,
+} from "../../../common/providers/slices/blogSlice";
+import Loading from "../../../common/pages/loading";
+import NotificationInfo from "../../../common/components/notification";
 
 const AddBlog = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const { blogs, message, loading, notification } = useSelector(
+    (state) => state.blog
+  );
+
   const [showBodyBlog, setShowBodyBlog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [stateNotification, dispatchNotification] = useProviderNotification();
 
   const addBlogBreadcrumb = {
     buttonBack: {
@@ -55,10 +64,8 @@ const AddBlog = () => {
     ) {
       setErrorMessage("Missing filed");
     }
-    const blog = await createBlog(dataBlog);
-    if (blog) {
-      dispatchNotification(actions.setNotificationAdd(true));
-    }
+
+    dispatch(createBlogThunk(dataBlog));
   };
 
   const data = {
@@ -129,28 +136,34 @@ const AddBlog = () => {
   };
 
   return (
-    <MainLayout>
-      <Breadcrumb data={addBlogBreadcrumb} />
-      {showBodyBlog ? (
-        <BoxViewBlogBody data={dataBlog.body} close={handleShowBodyBlog} />
+    <>
+      {loading ? (
+        <Loading />
       ) : (
-        <>
-          {errorMessage && <p>{errorMessage}</p>}
-          <div className="blog blog_add">
-            <BoxAddBlog data={data} />
-            <div>
-              <BoxViewBlog data={dataBlog} viewBody={handleShowBodyBlog} />
-            </div>
-          </div>
-          {stateNotification.notification.add && (
-            <Notification
-              type="add"
-              data={{ title: "Notificaiotn", body: "Create Success!" }}
-            />
+        <MainLayout>
+          <Breadcrumb data={addBlogBreadcrumb} />
+          {showBodyBlog ? (
+            <BoxViewBlogBody data={dataBlog.body} close={handleShowBodyBlog} />
+          ) : (
+            <>
+              {errorMessage && <p>{errorMessage}</p>}
+              <div className="blog blog_add">
+                <BoxAddBlog data={data} />
+                <div>
+                  <BoxViewBlog data={dataBlog} viewBody={handleShowBodyBlog} />
+                </div>
+              </div>
+            </>
           )}
-        </>
+        </MainLayout>
       )}
-    </MainLayout>
+      {notification && (
+        <NotificationInfo
+          info={message}
+          handleClose={() => dispatch(closeMessage(""))}
+        />
+      )}
+    </>
   );
 };
 

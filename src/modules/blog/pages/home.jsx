@@ -6,24 +6,22 @@ import { enumMoney } from "../../../common/enum/money";
 import { enumBlog } from "../../../common/enum/blog";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { actions, useProviderBlog } from "../../../common/providers";
-import { getAllBlog } from "../../../common/api/blogAPI";
+import { useSelector, useDispatch } from "react-redux";
+import { getAllBlogThunk } from "../../../common/providers/slices/blogSlice";
+
 const HomeBlog = () => {
   const navigate = useNavigate();
-  const [stateBlog, dispatchBlog] = useProviderBlog();
+  const dispatch = useDispatch();
+  const { blogs } = useSelector((state) => state.blog);
+
   useEffect(() => {
-    (async () => {
-      if (stateBlog.blogs.length < 1) {
-        const blogs = await getAllBlog();
-        dispatchBlog(actions.getBlogs(blogs));
-      }
-    })();
+    dispatch(getAllBlogThunk());
   }, []);
 
   const dataTotalViewBlog = {
     title: "View Blog",
     svg: "blog",
-    total: stateBlog.blogs?.length,
+    total: blogs?.length,
   };
 
   const dataViewMoneyBlog = {
@@ -40,7 +38,7 @@ const HomeBlog = () => {
     dataTable: {
       type: enumBlog.viewList.table.type,
       dataTableTitle: enumBlog.viewList.table.titles,
-      dataList: stateBlog.blogs || [],
+      dataList: blogs || [],
     },
   };
 
@@ -51,13 +49,13 @@ const HomeBlog = () => {
   const dataListBlog = {
     svg: enumBlog.full.svg,
     title: enumBlog.full.title,
-    total: stateBlog.blogs.length,
+    total: blogs.length,
     selects: enumBlog.full.selects,
     type: enumBlog.full.type,
     dataTable: {
       type: enumBlog.full.table.type,
       titles: enumBlog.full.table.titles,
-      dataView: stateBlog.blogs || [],
+      dataView: blogs || [],
       navigateDetail,
     },
   };

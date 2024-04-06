@@ -26,6 +26,10 @@
     color: $color_red;
     align-self: flex-start;
   }
+  &_success {
+    color: $color_green;
+    align-self: flex-start;
+  }
   &_footer {
     @include dynamicAlign();
     a {

@@ -1,44 +1,58 @@
 import axios from "axios";
 
-export const getAllBlog = async () => {
+export const getAllBlogAPI = async () => {
   try {
-    const getBlogs = await axios.get(`${import.meta.env.VITE_TWIN_API}/blog`);
-    return getBlogs.data.data;
+    const getBlogAPIs = await axios.get(
+      `${import.meta.env.VITE_TWIN_API}/blog`
+    );
+    return getBlogAPIs.data.data;
   } catch (error) {
     console.log("error warning up app", error);
   }
 };
 
-export const getBlog = async (id) => {
+export const getBlogAPI = async (id) => {
   try {
-    const getBlogs = await axios.get(
+    const getBlogAPIs = await axios.get(
       `${import.meta.env.VITE_TWIN_API}/blog/find/${id}`
     );
-    return getBlogs.data.data;
+    return getBlogAPIs.data.data;
   } catch (error) {
     console.log("error warning up app", error);
   }
 };
 
-export const createBlog = async (payload) => {
+export const createBlogAPI = async (payload) => {
   try {
     const newBlog = await axios.post(
       `${import.meta.env.VITE_TWIN_API}/blog/add`,
       payload
     );
-    return newBlog.data.data;
+    return newBlog.data;
   } catch (error) {
-    console.log("Can't create category", error);
+    console.log("Can't create blog", error);
   }
 };
 
-export const deleteBlog = async (payload) => {
+export const editBlogAPI = async (payload) => {
   try {
-    const category = await axios.delete(
+    const newBlog = await axios.put(
+      `${import.meta.env.VITE_TWIN_API}/blog/edit/${payload._id}`,
+      payload
+    );
+    return newBlog.data;
+  } catch (error) {
+    console.log("Can't edit blog", error);
+  }
+};
+
+export const deleteBlogAPI = async (payload) => {
+  try {
+    const blog = await axios.delete(
       `${import.meta.env.VITE_TWIN_API}/blog/delete/${payload}`
     );
-    return category.data.data;
+    return blog.data;
   } catch (error) {
-    console.log("Can't delete category", error);
+    console.log("Can't delete blog", error);
   }
 };

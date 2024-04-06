@@ -6,9 +6,10 @@ export const signup = async (payload) => {
       `${import.meta.env.VITE_TWIN_API}/user/add`,
       payload
     );
-    return user.data.data;
+    return user.data;
   } catch (error) {
     console.log("error warning up app", error);
+    return error.response.data;
   }
 };
 
@@ -25,7 +26,7 @@ export const login = async (payload) => {
   }
 };
 
-export const createProduct = async (payload) => {
+export const createProductAPI = async (payload) => {
   try {
     const newProduct = await axios.post(
       `${import.meta.env.VITE_TWIN_API}/product/add`,
@@ -37,7 +38,7 @@ export const createProduct = async (payload) => {
   }
 };
 
-export const updateProduct = async (payload) => {
+export const updateProductAPI = async (payload) => {
   try {
     const product = await axios.put(
       `${import.meta.env.VITE_TWIN_API}/product/edit/${payload._id}`,
@@ -49,7 +50,7 @@ export const updateProduct = async (payload) => {
   }
 };
 
-export const deleteProduct = async (payload) => {
+export const deleteProductAPI = async (payload) => {
   try {
     const product = await axios.delete(
       `${import.meta.env.VITE_TWIN_API}/product/delete/${payload}`

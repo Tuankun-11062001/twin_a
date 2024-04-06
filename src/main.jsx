@@ -1,10 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./common/sass/index.scss";
-import { AppProvider } from "./common/providers";
+import ProviderStore from "./common/providers/providerStore.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <AppProvider />
+    <ProviderStore/>
   </React.StrictMode>
 );

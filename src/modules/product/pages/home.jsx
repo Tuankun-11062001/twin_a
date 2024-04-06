@@ -3,32 +3,28 @@ import MainLayout from "../../../common/layout/mainLayout";
 import Breadcrumb from "../../../common/components/breadcrumb";
 import { BoxList, BoxView, BoxViewList } from "../../../common/components/box";
 import { useNavigate } from "react-router-dom";
-import { actions, useProviderProduct } from "../../../common/providers";
-import { getAllProduct } from "../../../common/api/productAPI";
 import { enumProduct } from "../../../common/enum/product";
 import { enumMoney } from "../../../common/enum/money";
+import { useSelector, useDispatch } from "react-redux";
+import { getProductsThunk } from "../../../common/providers/slices/productSlice";
 
 const HomeProduct = () => {
   const navigate = useNavigate();
-  const [stateProduct, dispatchProduct] = useProviderProduct();
+  const dispatch = useDispatch();
+  const { products, loading } = useSelector((state) => state.product);
 
   // =================================================================
   //                    Loading data
   // =================================================================
 
   useEffect(() => {
-    (async () => {
-      if (stateProduct.products.length < 1) {
-        const listProduct = await getAllProduct();
-        dispatchProduct(actions.getProducts(listProduct));
-      }
-    })();
+    dispatch(getProductsThunk());
   }, []);
 
   const dataProductTotal = {
     svg: enumProduct.svg,
     title: enumProduct.titleTotal,
-    total: stateProduct.products.length,
+    total: products.length,
   };
 
   const dataProductMoney = {
@@ -44,7 +40,7 @@ const HomeProduct = () => {
     dataTable: {
       type: enumProduct.viewList.table.type,
       dataTableTitle: enumProduct.viewList.table.titles,
-      dataList: stateProduct.products,
+      dataList: products,
     },
     selects: enumProduct.viewList.selects,
   };
@@ -62,7 +58,7 @@ const HomeProduct = () => {
     dataTable: {
       type: enumProduct.full.table.type,
       titles: enumProduct.full.table.titles,
-      dataView: stateProduct.products,
+      dataView: products,
       navigateDetail,
     },
   };
@@ -93,8 +89,8 @@ const HomeProduct = () => {
       <Breadcrumb data={productBreadcrum} />
       <div className="product product_head">
         <BoxView data={dataProductTotal} classname="box box_view" />
-        <BoxView data={dataProductMoney} classname="box box_view" />
-        <BoxViewList data={dataViewListProductToday} />
+        {/* <BoxView data={dataProductMoney} classname="box box_view" />
+        <BoxViewList data={dataViewListProductToday} /> */}
       </div>
       <BoxList data={dataListProduct} />
     </MainLayout>

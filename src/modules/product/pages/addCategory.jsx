@@ -1,23 +1,27 @@
 import React, { useState } from "react";
 import MainLayout from "../../../common/layout/mainLayout";
 import Breadcrumb from "../../../common/components/breadcrumb";
+
+import Notification from "../../../common/components/notification";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import {
   BoxAddCategoryAndPartner,
   BoxView,
 } from "../../../common/components/box";
-import { createCategory } from "../../../common/api/categoryAPI";
+import NotificationInfo from "../../../common/components/notification";
 import {
-  actions,
-  useProviderCategory,
-  useProviderNotification,
-} from "../../../common/providers";
-import Notification from "../../../common/components/notification";
-import { useNavigate } from "react-router-dom";
+  closeMessage,
+  createCategoryThunk,
+} from "../../../common/providers/slices/categorySlice";
+import Loading from "../../../common/pages/loading";
 
 const AddCategory = () => {
   const navigate = useNavigate();
-  const [stateCategory, dispatchCategory] = useProviderCategory();
-  const [stateNotification, dispatchNotification] = useProviderNotification();
+  const { categories, loading, message } = useSelector(
+    (state) => state.category
+  );
+  const dispatch = useDispatch();
 
   const [dataCategory, setDataCategory] = useState({
     categoryCode: "",
@@ -32,17 +36,10 @@ const AddCategory = () => {
 
   const handleSubmit = async () => {
     try {
-      const newCategory = await createCategory(dataCategory);
-      dispatchCategory(actions.createCategory(newCategory));
-      dispatchNotification(actions.setNotificationAdd(true));
+      dispatch(createCategoryThunk(dataCategory));
     } catch (error) {
       console.log("can't create category", error);
     }
-  };
-
-  const dataNotification = {
-    title: "Notification",
-    body: "Create category successfully",
   };
 
   const data = {
@@ -85,14 +82,13 @@ const AddCategory = () => {
   const dataViewTotalCategory = {
     title: "Total Category",
     svg: "view",
-    view: stateCategory.categories?.length,
+    view: categories?.length,
   };
 
   const dataTotalProduct = {
     title: "Total Product",
     svg: "view",
   };
-  console.log(stateNotification);
 
   const addCategoryBreadcrumb = {
     title: "Add Category",
@@ -102,17 +98,29 @@ const AddCategory = () => {
   };
 
   return (
-    <MainLayout>
-      <Breadcrumb data={addCategoryBreadcrumb} />
-      <div className="category category_add">
-        <BoxAddCategoryAndPartner data={data} />
-        <BoxView data={dataViewTotalCategory} classname="box box_view_small" />
-        <BoxView data={dataTotalProduct} classname="box box_view_small" />
-      </div>
-      {stateNotification.notification.add && (
-        <Notification type="add" data={dataNotification} />
+    <>
+      {loading ? (
+        <Loading />
+      ) : (
+        <MainLayout>
+          <Breadcrumb data={addCategoryBreadcrumb} />
+          <div className="category category_add">
+            <BoxAddCategoryAndPartner data={data} />
+            <BoxView
+              data={dataViewTotalCategory}
+              classname="box box_view_small"
+            />
+            <BoxView data={dataTotalProduct} classname="box box_view_small" />
+          </div>
+          {message && (
+            <NotificationInfo
+              info={message}
+              handleClose={() => dispatch(closeMessage(""))}
+            />
+          )}
+        </MainLayout>
       )}
-    </MainLayout>
+    </>
   );
 };
 

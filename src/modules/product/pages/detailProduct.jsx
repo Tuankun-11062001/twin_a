@@ -8,63 +8,57 @@ import {
   BoxView,
   BoxViewEditProduct,
 } from "../../../common/components/box";
-import {
-  actions,
-  useProviderCategory,
-  useProviderNotification,
-  useProviderPartner,
-  useProviderProduct,
-} from "../../../common/providers";
-import {
-  deleteProduct,
-  getProductById,
-  updateProduct,
-} from "../../../common/api/productAPI";
+
 import { enumPublish } from "../../../common/enum/publish";
-import Notification from "../../../common/components/notification";
-import { getAllCategories } from "../../../common/api/categoryAPI";
-import { getAllPartners } from "../../../common/api/partnerAPI";
+
+import { useDispatch, useSelector } from "react-redux";
+import { getAllCategoriesThunk } from "../../../common/providers/slices/categorySlice";
+import { getAllPartnerThunk } from "../../../common/providers/slices/partnerSlice";
+import {
+  askDelProduct,
+  closeMessage,
+  deleteProductThunk,
+  editProductThunk,
+  getProductByID,
+} from "../../../common/providers/slices/productSlice";
+import { enumSeason } from "../../../common/enum/season";
+import { enumHotProduct } from "../../../common/enum/hotProduct";
+import { enumSaleProduct } from "../../../common/enum/saleProduct";
+import NotificationInfo, {
+  NotificationAsk,
+} from "../../../common/components/notification";
 
 const DetailProduct = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const dataPrevRoute = location.state;
+  const dispatch = useDispatch();
+  const { product, loading, notification, message, notificationEdit } =
+    useSelector((state) => state.product);
+  const { categories } = useSelector((state) => state.category);
+  const { partners } = useSelector((state) => state.partner);
 
-  const [stateCategory, dispatchCategory] = useProviderCategory();
-  const [statePartner, dispatchPartner] = useProviderPartner();
-  const [stateNotification, dispatchNotification] = useProviderNotification();
-  const [stateProduct, dispatchProduct] = useProviderProduct();
+  const [dataProduct, setDataProduct] = useState({});
 
-  const [dataProduct, setDataProduct] = useState({
-    publish: true,
-    code: "",
-    title: "",
-    currentImage: "",
-    image: [],
-    category: "",
-    partner: "",
-    price: "",
-    profit: "",
-    description: "",
-  });
+  console.log("state product", dataProduct);
+  console.log("product", product);
 
   useEffect(() => {
     (async () => {
-      if (dataPrevRoute) {
-        const product = await getProductById(dataPrevRoute);
-        setDataProduct(product);
-      }
-      if (stateCategory.categories.length < 1) {
-        const listCategory = await getAllCategories();
-        dispatchCategory(actions.getCategories(listCategory));
+      dispatch(getProductByID(dataPrevRoute));
+      if (categories.length < 1) {
+        dispatch(getAllCategoriesThunk());
       }
 
-      if (statePartner.partners.length < 1) {
-        const listPartners = await getAllPartners();
-        dispatchPartner(actions.getPartners(listPartners));
+      if (partners.length < 1) {
+        dispatch(getAllPartnerThunk());
       }
     })();
   }, []);
+
+  useEffect(() => {
+    setDataProduct(product);
+  }, [product]);
 
   const [isOneColor, setIsAddOneColor] = useState(false);
 
@@ -112,10 +106,7 @@ const DetailProduct = () => {
   };
 
   const onListenSave = async () => {
-    console.log("data", dataProduct);
-    const listProduct = await updateProduct(dataProduct);
-    dispatchProduct(actions.getProducts(listProduct));
-    dispatchNotification(actions.setNotificationAdd(true));
+    dispatch(editProductThunk(dataProduct));
   };
 
   const data = {
@@ -143,6 +134,44 @@ const DetailProduct = () => {
       inputListen: formListen,
       inputName: "code",
       inputValue: dataProduct.code,
+    },
+
+    //  =================================================================
+    //                          form group seasson
+    //  =================================================================
+
+    formGroupSeason: {
+      type: "select",
+      classnameFormGroup: "form_group",
+      lable: "Season",
+      dataSelect: enumSeason.selects || [],
+      classnameSelect: "select select_edit_product",
+      inputValue: dataProduct.season,
+      inputName: "season",
+      inputListen: formListen,
+    },
+
+    //  =================================================================
+    //                          Hot product select
+    //  =================================================================
+
+    selectHotProduct: {
+      name: "hotProduct",
+      onListen: formListen,
+      value: dataProduct.hotProduct,
+      classname: "select select_publish",
+      data: enumHotProduct.selects,
+    },
+    //  =================================================================
+    //                          Sale Product select
+    //  =================================================================
+
+    selectSaleProduct: {
+      name: "saleProduct",
+      onListen: formListen,
+      value: dataProduct.saleProduct,
+      classname: "select select_publish",
+      data: enumSaleProduct.selects,
     },
 
     //  =================================================================
@@ -188,7 +217,7 @@ const DetailProduct = () => {
       type: "select",
       classnameFormGroup: "form_group",
       lable: "Category",
-      dataSelect: stateCategory.categories || [],
+      dataSelect: categories || [],
       classnameSelect: "select select_edit_product",
       inputValue: dataProduct.category,
       inputName: "category",
@@ -217,7 +246,7 @@ const DetailProduct = () => {
       type: "select",
       classnameFormGroup: "form_group",
       lable: "Partner",
-      dataSelect: statePartner.partners,
+      dataSelect: partners,
       classnameSelect: "select select_edit_product",
       inputValue: dataProduct.partner,
       inputName: "partner",
@@ -262,21 +291,10 @@ const DetailProduct = () => {
   };
 
   const handleDelete = () => {
-    dispatchNotification(actions.setNotificationDelete(true));
+    dispatch(askDelProduct(dataProduct));
   };
-  const handleYesDelete = async () => {
-    const listProduct = await deleteProduct(dataProduct._id);
-    if (listProduct) {
-      dispatchProduct(actions.getProducts(listProduct));
-      dispatchNotification(actions.setNotificationDelete(false));
-      setTimeout(() => navigate(-1), 1000);
-    }
-  };
-  const dataNotificationDel = {
-    title: "Delete Product",
-    code: dataProduct.code,
-    body: "Are you sure you want to delete this product?",
-    handleYesDelete,
+  const handleAcceptDel = async () => {
+    dispatch(deleteProductThunk(dataProduct));
   };
 
   const detailProductBreadcrumb = {
@@ -304,25 +322,26 @@ const DetailProduct = () => {
             <div className="product_detail_page_left">
               <BoxEditProduct data={data} />
             </div>
-            <div className="product_detail_page_right">
+            {/* <div className="product_detail_page_right">
               <BoxViewEditProduct data={dataViewEdit} />
-              <div className="product_detail_page_right_bottom">
-                <BoxView type="earn" data={{}} />
-              </div>
-            </div>
+            </div> */}
           </div>
-          {stateNotification.notification.add && (
-            <Notification
-              type="add"
-              data={{ title: "Notification", body: "Change Product Success!" }}
-            />
-          )}
-          {stateNotification.notification.delete && (
-            <Notification type="delete" data={dataNotificationDel} />
-          )}
         </MainLayout>
       ) : (
         <NotFound404 />
+      )}
+      {notification && (
+        <NotificationAsk
+          info={message}
+          handleClose={() => dispatch(closeMessage())}
+          handleAccept={handleAcceptDel}
+        />
+      )}
+      {notificationEdit && (
+        <NotificationInfo
+          info={message}
+          handleClose={() => dispatch(closeMessage())}
+        />
       )}
     </>
   );

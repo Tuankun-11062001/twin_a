@@ -4,53 +4,24 @@ import { useNavigate } from "react-router-dom";
 import Loading from "../pages/loading";
 import Breadcrumb from "../components/breadcrumb";
 import { BoxList, BoxView, BoxViewList } from "../components/box";
-import {
-  actions,
-  useProviderBlog,
-  useProviderCategory,
-  useProviderPartner,
-  useProviderProduct,
-} from "../providers";
-import { getAllCategories } from "../api/categoryAPI";
-import { getAllPartners } from "../api/partnerAPI";
-import { getAllProduct } from "../api/productAPI";
 import { enumVisitor } from "../enum/visitor";
 import { enumBlog } from "../enum/blog";
 import { enumProduct } from "../enum/product";
 import { enumMoney } from "../enum/money";
-import { getAllBlog } from "../api/blogAPI";
+import { useSelector, useDispatch } from "react-redux";
+import { getProductsThunk } from "../providers/slices/productSlice";
+import { getAllBlogThunk } from "../providers/slices/blogSlice";
 
 const Home = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-
-  // =================================================================
-  //                    Loading data
-  // =================================================================
-  const [stateCategory, dispatchCategory] = useProviderCategory();
-  const [statePartner, dispatchPartner] = useProviderPartner();
-  const [stateProduct, dispatchProduct] = useProviderProduct();
-  const [stateBlog, dispatchBlog] = useProviderBlog();
+  const dispatch = useDispatch();
+  const [loadingToken, setLoadingToken] = useState(true);
+  const { products, loading } = useSelector((state) => state.product);
+  const { blogs } = useSelector((state) => state.blog);
 
   useEffect(() => {
-    (async () => {
-      if (stateCategory.categories?.length < 1) {
-        const listCategory = await getAllCategories();
-        dispatchCategory(actions.getCategories(listCategory));
-      }
-      if (statePartner.partners?.length < 1) {
-        const listPartner = await getAllPartners();
-        dispatchPartner(actions.getPartners(listPartner));
-      }
-      if (stateProduct.products?.length < 1) {
-        const listProduct = await getAllProduct();
-        dispatchProduct(actions.getProducts(listProduct));
-      }
-      if (stateBlog.blogs?.length < 1) {
-        const listProduct = await getAllBlog();
-        dispatchBlog(actions.getBlogs(listProduct));
-      }
-    })();
+    dispatch(getProductsThunk());
+    dispatch(getAllBlogThunk());
   }, []);
 
   // =================================================================
@@ -61,7 +32,7 @@ const Home = () => {
     if (!localStorage.getItem("token")) {
       navigate("/login");
     }
-    setLoading(false);
+    setLoadingToken(false);
   }, []);
 
   // =================================================================
@@ -82,16 +53,7 @@ const Home = () => {
     dataTable: {
       type: enumBlog.viewList.table.type,
       dataTableTitle: enumBlog.viewList.table.titles,
-      dataList: [
-        {
-          title: "How to make navigation 3d UI",
-          view: "300",
-        },
-        {
-          title: "How to make navigation 3d UI",
-          view: "300",
-        },
-      ],
+      dataList: blogs,
     },
   };
 
@@ -102,7 +64,7 @@ const Home = () => {
     dataTable: {
       type: enumProduct.viewList.table.type,
       dataTableTitle: enumProduct.viewList.table.titles,
-      dataList: stateProduct.products,
+      dataList: products,
     },
     selects: enumProduct.viewList.selects,
   };
@@ -124,7 +86,7 @@ const Home = () => {
     dataTable: {
       type: enumProduct.listShort.table.type,
       titles: enumProduct.listShort.table.titles,
-      dataView: stateProduct.products,
+      dataView: products,
       navigateDetail,
     },
   };
@@ -148,12 +110,12 @@ const Home = () => {
   const dataListBlog = {
     svg: enumBlog.listShort.svg,
     title: enumBlog.listShort.title,
-    total: stateBlog.blogs?.length,
+    total: blogs?.length,
     selects: enumBlog.listShort.selects,
     dataTable: {
       type: enumBlog.listShort.table.type,
       titles: enumBlog.listShort.table.titles,
-      dataView: stateBlog.blogs,
+      dataView: blogs,
       navigateDetail: navigateDetailBlog,
     },
   };
@@ -172,18 +134,18 @@ const Home = () => {
       ) : (
         <MainLayout>
           <Breadcrumb data={{ title: "DashBoard" }} />
-          <div className="dashboard dashboard_view">
+          {/* <div className="dashboard dashboard_view">
             <BoxView data={dataViewVisistor} classname="box box_view_small" />
             <BoxViewList data={dataViewListBlog || []} />
             <BoxViewList data={dataViewListProduct || []} />
-          </div>
+          </div> */}
           <div className="dashboard dashboard_product">
             <BoxList data={dataListProduct || []} />
-            <BoxView data={dataViewMoneyProduct} classname="box box_view" />
+            {/* <BoxView data={dataViewMoneyProduct} classname="box box_view" /> */}
           </div>
           <div className="dashboard dashboard_blog">
             <BoxList data={dataListBlog || []} />
-            <BoxView data={dataViewMoneyBlog || []} classname="box box_view" />
+            {/* <BoxView data={dataViewMoneyBlog || []} classname="box box_view" /> */}
           </div>
         </MainLayout>
       )}

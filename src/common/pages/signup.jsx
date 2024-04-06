@@ -3,19 +3,23 @@ import logoImage from "../assets/logo.png";
 import Input from "../components/widget/input";
 import Button from "../components/widget/button";
 import { Link } from "react-router-dom";
-import { auth } from "../localData/auth";
-import Notification from "../components/notification";
-import { signup } from "../api/userAPI";
+import { useDispatch, useSelector } from "react-redux";
+import { resetMessage, signUpThunk } from "../providers/slices/userSlice";
+import NotificationInfo from "../components/notification";
 
 const Signup = () => {
+  const dispatch = useDispatch();
+  const { user, message } = useSelector((state) => state.user);
+
   const [dataForm, setDataForm] = useState({
     email: "",
     password: "",
     rePassword: "",
   });
 
+  console.log("message", message);
+
   const [errorForm, setErrorForm] = useState("");
-  const [notification, setNotification] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -24,6 +28,7 @@ const Signup = () => {
       [name]: value,
     });
     setErrorForm("");
+    dispatch(resetMessage(""));
   };
 
   const onSubmit = async () => {
@@ -49,11 +54,7 @@ const Signup = () => {
       return;
     }
 
-    const user = await signup(dataForm);
-
-    if (user) {
-      setNotification(true);
-    }
+    dispatch(signUpThunk(dataForm));
   };
   return (
     <div className="layout layout_signup signup">
@@ -95,6 +96,7 @@ const Signup = () => {
             />
           </div>
 
+          {message && <p className="signup_success">{message}</p>}
           {errorForm && <p className="signup_error">{errorForm}</p>}
           <Button
             title="Sign up"
@@ -106,7 +108,6 @@ const Signup = () => {
               If you have account, so <Link to="/login">Login here!</Link>
             </p>
           </div>
-          {notification && <Notification type="signup" />}
         </div>
       </div>
     </div>

@@ -1,23 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { deleteBlog, getBlog } from "../../../common/api/blogAPI";
+import { deleteBlogAPI, getBlogAPI } from "../../../common/api/blogAPI";
 import {
   BoxAddBlog,
   BoxViewBlog,
   BoxViewBlogBody,
 } from "../../../common/components/box";
 import Breadcrumb from "../../../common/components/breadcrumb";
-import Notification from "../../../common/components/notification";
+import Notification, {
+  NotificationAsk,
+} from "../../../common/components/notification";
 import { enumPublish } from "../../../common/enum/publish";
 import MainLayout from "../../../common/layout/mainLayout";
-import { actions, useProviderNotification } from "../../../common/providers";
+import Loading from "../../../common/pages/loading";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  askDelBlog,
+  closeMessage,
+  deleteBlogThunk,
+  editBlogThunk,
+} from "../../../common/providers/slices/blogSlice";
+import NotificationInfo from "../../../common/components/notification";
 
 const DetailBlog = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+  const { notification, message, notificationEdit } = useSelector(
+    (state) => state.blog
+  );
   const [showBodyBlog, setShowBodyBlog] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const [stateNotification, dispatchNotification] = useProviderNotification();
   const [showEdit, setShowEdit] = useState(false);
 
   const [dataBlog, setDatablog] = useState({
@@ -31,7 +44,7 @@ const DetailBlog = () => {
   useEffect(() => {
     (async () => {
       if (location.state) {
-        const blog = await getBlog(location.state);
+        const blog = await getBlogAPI(location.state);
         setDatablog(blog);
         setTimeout(() => setShowEdit(true), 1000);
       }
@@ -49,7 +62,7 @@ const DetailBlog = () => {
 
   // const listenBody =
 
-  const onListenEdit = async () => {
+  const onListenCreate = async () => {
     if (
       dataBlog.title === "" ||
       dataBlog.thumbnail === "" ||
@@ -58,29 +71,16 @@ const DetailBlog = () => {
     ) {
       setErrorMessage("Missing filed");
     }
-    const blog = await createBlog(dataBlog);
-    if (blog) {
-      dispatchNotification(actions.setNotificationAdd(true));
-    }
+    dispatch(editBlogThunk(dataBlog));
   };
 
   const handleDelete = () => {
-    dispatchNotification(actions.setNotificationDelete(true));
+    dispatch(askDelBlog(location.state));
   };
 
-  const handleYesDelete = async () => {
-    const blogDel = await deleteBlog(dataBlog._id);
-    if (blogDel) {
-      navigate(-1);
-      dispatchNotification(actions.setNotificationDelete(false));
-    }
-  };
-
-  const dataNotificationDel = {
-    title: "Delete Blog",
-    code: dataBlog.title,
-    body: "Are you sure you want to delete this blog?",
-    handleYesDelete,
+  const handleAcceptDelete = async () => {
+    dispatch(deleteBlogThunk(location.state));
+    // navigate(-1);
   };
 
   const data = {
@@ -147,7 +147,7 @@ const DetailBlog = () => {
       inputValue: dataBlog.body,
       inputListen: setDatablog,
     },
-    onListenEdit,
+    onListenCreate,
   };
 
   const detailBlogBreadcrumb = {
@@ -181,16 +181,20 @@ const DetailBlog = () => {
               </div>
             </div>
           ) : (
-            <p>Loading...</p>
+            <Loading />
           )}
-          {stateNotification.notification.add && (
-            <Notification
-              type="add"
-              data={{ title: "Notificaiotn", body: "Edit Success!" }}
+          {notification && (
+            <NotificationAsk
+              info={message}
+              handleClose={() => dispatch(closeMessage())}
+              handleAccept={handleAcceptDelete}
             />
           )}
-          {stateNotification.notification.delete && (
-            <Notification type="delete" data={dataNotificationDel} />
+          {notificationEdit && (
+            <NotificationInfo
+              info={message}
+              handleClose={() => dispatch(closeMessage())}
+            />
           )}
         </>
       )}

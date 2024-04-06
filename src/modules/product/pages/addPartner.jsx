@@ -1,23 +1,25 @@
 import React, { useState } from "react";
 import MainLayout from "../../../common/layout/mainLayout";
 import Breadcrumb from "../../../common/components/breadcrumb";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
 import {
   BoxAddCategoryAndPartner,
   BoxView,
 } from "../../../common/components/box";
+import NotificationInfo from "../../../common/components/notification";
 import {
-  actions,
-  useProviderNotification,
-  useProviderPartner,
-} from "../../../common/providers";
-import Notification from "../../../common/components/notification";
-import { useNavigate } from "react-router-dom";
-import { createPartner } from "../../../common/api/partnerAPI";
+  addPartnerThunk,
+  closeMessage,
+} from "../../../common/providers/slices/partnerSlice";
+import Loading from "../../../common/pages/loading";
 
 const AddPartner = () => {
   const navigate = useNavigate();
-  const [statePartner, dispatchPartner] = useProviderPartner();
-  const [stateNotification, dispatchNotification] = useProviderNotification();
+  const dispatch = useDispatch();
+  const { partners, message, loading, notification } = useSelector(
+    (state) => state.partner
+  );
 
   const [dataPartner, setDataPartner] = useState({
     title: "",
@@ -31,17 +33,10 @@ const AddPartner = () => {
 
   const handleSubmit = async () => {
     try {
-      const newPartner = await createPartner(dataPartner);
-      dispatchPartner(actions.createPartner(newPartner));
-      dispatchNotification(actions.setNotificationAdd(true));
+      dispatch(addPartnerThunk(dataPartner));
     } catch (error) {
       console.log("can't create category", error);
     }
-  };
-
-  const dataNotification = {
-    title: "Notification",
-    body: "Create category successfully",
   };
 
   const data = {
@@ -72,7 +67,7 @@ const AddPartner = () => {
   const dataViewTotalCategory = {
     title: "Total Category",
     svg: "view",
-    view: statePartner.partners?.length,
+    view: partners?.length,
   };
 
   const dataTotalProduct = {
@@ -88,17 +83,29 @@ const AddPartner = () => {
   };
 
   return (
-    <MainLayout>
-      <Breadcrumb data={addPartnerBreadcrumb} />
-      <div className="category category_add">
-        <BoxAddCategoryAndPartner data={data} />
-        <BoxView data={dataViewTotalCategory} classname="box box_view_small" />
-        <BoxView data={dataTotalProduct} classname="box box_view_small" />
-      </div>
-      {stateNotification.notification.add && (
-        <Notification type="add" data={dataNotification} />
+    <>
+      {loading ? (
+        <Loading />
+      ) : (
+        <MainLayout>
+          <Breadcrumb data={addPartnerBreadcrumb} />
+          <div className="category category_add">
+            <BoxAddCategoryAndPartner data={data} />
+            <BoxView
+              data={dataViewTotalCategory}
+              classname="box box_view_small"
+            />
+            <BoxView data={dataTotalProduct} classname="box box_view_small" />
+          </div>
+          {notification && (
+            <NotificationInfo
+              info={message}
+              handleClose={() => dispatch(closeMessage(""))}
+            />
+          )}
+        </MainLayout>
       )}
-    </MainLayout>
+    </>
   );
 };
 

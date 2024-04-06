@@ -3,11 +3,8 @@ import searchIcon from "../assets/searchIcon.svg";
 import usericon from "../assets/user.svg";
 import Button from "../components/widget/button";
 import { useNavigate } from "react-router-dom";
-import { useProviderNotification } from "../providers/hooks";
 
-const NavTop = () => {
-  const [state, dispatch] = useProviderNotification();
-  console.log("state", state);
+const NavTop = () => {  
 
   const navigate = useNavigate();
   const onBoxAdmin = (e) => {

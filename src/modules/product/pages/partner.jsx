@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useState } from "react";
 import MainLayout from "../../../common/layout/mainLayout";
 import Breadcrumb from "../../../common/components/breadcrumb";
 import {
@@ -6,40 +6,34 @@ import {
   BoxView,
   BoxViewListCategoryAndPartner,
 } from "../../../common/components/box";
-import {
-  actions,
-  useProviderNotification,
-  useProviderPartner,
-  useProviderProduct,
-} from "../../../common/providers";
-import Notification from "../../../common/components/notification";
+import { NotificationAsk } from "../../../common/components/notification";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  getAllPartners,
-  deletePartner as deletePartnerAPI,
-} from "../../../common/api/partnerAPI";
-import { deletePartner } from "../../../common/providers/actions";
 import { enumProduct } from "../../../common/enum/product";
-import { getAllProduct } from "../../../common/api/productAPI";
 import { enumNotification } from "../../../common/enum/notification";
-
+import { useSelector, useDispatch } from "react-redux";
+import {
+  closeMessage,
+  deletePartnerThunk,
+  getAllPartnerThunk,
+  notificationDelete,
+} from "../../../common/providers/slices/partnerSlice";
+import { getProductsThunk } from "../../../common/providers/slices/productSlice";
 const Partner = () => {
   const navigate = useNavigate();
-  const [stateNotification, dispatchNotification] = useProviderNotification();
-  const [statePartner, dispatchPartner] = useProviderPartner();
-  const [stateProduct, dispatchProduct] = useProviderProduct();
-  const [stateDataDelete, setStateDataDelete] = useState({});
+  const dispatch = useDispatch();
+  const { partners, notification, message, idPartner } = useSelector(
+    (state) => state.partner
+  );
+  const { products } = useSelector((state) => state.product);
 
   useEffect(() => {
     (async () => {
-      if (statePartner.partners.length < 1) {
-        const listPartners = await getAllPartners();
-        dispatchPartner(actions.getPartners(listPartners));
+      if (partners.length < 1) {
+        dispatch(getAllPartnerThunk());
       }
-      if (stateProduct.products.length < 1) {
-        const listProduct = await getAllProduct();
-        dispatchProduct(actions.getProducts(listProduct));
+      if (products.length < 1) {
+        dispatch(getProductsThunk());
       }
     })();
   }, []);
@@ -47,7 +41,7 @@ const Partner = () => {
   const dataTotalCategory = {
     title: "Total Partners",
     svg: "product",
-    view: statePartner.partners?.length,
+    view: partners?.length,
   };
   const dataTotalProduct = {
     title: "Total product",
@@ -68,7 +62,7 @@ const Partner = () => {
     dataTable: {
       type: enumProduct.full.table.type,
       titles: enumProduct.full.table.titles,
-      dataView: stateProduct.products,
+      dataView: products,
       navigateDetail,
     },
   };
@@ -78,30 +72,20 @@ const Partner = () => {
   // =================================================================
 
   const handleDelete = async (dataCategory) => {
-    setStateDataDelete(dataCategory);
-    dispatchNotification(actions.setNotificationDelete(true));
+    dispatch(notificationDelete(dataCategory));
   };
 
-  const handleYesDelete = async () => {
-    const newListPartner = await deletePartnerAPI(stateDataDelete._id);
-    dispatchPartner(actions.deletePartner(newListPartner));
-    dispatchNotification(actions.setNotificationDelete(false));
+  const handleDeleteAccept = async () => {
+    dispatch(deletePartnerThunk(idPartner));
   };
 
   const handleView = () => {};
 
   const data = {
-    list: statePartner.partners,
+    list: partners,
     title: "Partners",
     handleDelete,
     handleView,
-  };
-
-  const dataNotification = {
-    title: enumNotification.partner.title,
-    code: stateDataDelete._id,
-    body: enumNotification.partner.body,
-    handleYesDelete,
   };
 
   const partnerBreadcrumbs = {
@@ -129,8 +113,12 @@ const Partner = () => {
         </div>
         <BoxList data={dataProduct} />
       </div>
-      {stateNotification.notification.delete && (
-        <Notification type="delete" data={dataNotification} />
+      {notification && (
+        <NotificationAsk
+          info={message}
+          handleClose={() => dispatch(closeMessage(""))}
+          handleAccept={() => handleDeleteAccept()}
+        />
       )}
     </MainLayout>
   );

@@ -190,10 +190,12 @@
 
   &_blog_view_body {
     img {
+      @include dynamicPosition(
+        $pos: relative,
+        $left: 50%,
+        $transform: translateX(-50%)
+      );
       width: 50%;
-      position: relative;
-      left: 50%;
-      transform: translateX(-50%);
       margin: 2rem 0;
     }
   }

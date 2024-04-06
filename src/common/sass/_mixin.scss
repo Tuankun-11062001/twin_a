@@ -12,3 +12,31 @@
   flex-direction: $direction;
   flex-wrap: $wrap;
 }
+
+@mixin dynamicPosition(
+  $pos: unset,
+  $left: unset,
+  $right: unset,
+  $top: unset,
+  $bottom: unset,
+  $transform: unset
+) {
+  position: $pos;
+  left: $left;
+  right: $right;
+  bottom: $bottom;
+  top: $top;
+  transform: $transform;
+}
+
+@mixin animateOpacity() {
+  animation: animate 0.3s linear;
+  @keyframes animate {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}

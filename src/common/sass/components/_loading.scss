@@ -1,0 +1,13 @@
+.loading {
+  @include dynamicPosition(
+    $pos: fixed,
+    $left: 0,
+    $right: 0,
+    $bottom: 0,
+    $top: 0
+  );
+  @include dynamicAlign($justify: center, $align: center);
+  @include animateOpacity();
+  z-index: 9;
+  background: $color_white;
+}

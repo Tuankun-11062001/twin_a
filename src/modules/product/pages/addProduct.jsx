@@ -6,39 +6,44 @@ import {
   BoxView,
   BoxViewEditProduct,
 } from "../../../common/components/box";
-import Notification from "../../../common/components/notification";
-import {
-  actions,
-  useProviderCategory,
-  useProviderNotification,
-  useProviderPartner,
-  useProviderProduct,
-} from "../../../common/providers";
-import { getAllCategories } from "../../../common/api/categoryAPI";
-import { useNavigate } from "react-router-dom";
-import { getAllPartners } from "../../../common/api/partnerAPI";
-import { createProduct } from "../../../common/api/productAPI";
-import { enumPublish } from "../../../common/enum/publish";
 
+import { getAllCategoriesAPI } from "../../../common/api/categoryAPI";
+import { useNavigate } from "react-router-dom";
+import { getAllPartnersAPI } from "../../../common/api/partnerAPI";
+import { createProductAPI } from "../../../common/api/productAPI";
+import { enumPublish } from "../../../common/enum/publish";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllCategoriesThunk } from "../../../common/providers/slices/categorySlice";
+import { getAllPartnerThunk } from "../../../common/providers/slices/partnerSlice";
+import { enumSeason } from "../../../common/enum/season";
+import { enumHotProduct } from "../../../common/enum/hotProduct";
+import { enumSaleProduct } from "../../../common/enum/saleProduct";
+import {
+  closeMessage,
+  createProductThunk,
+} from "../../../common/providers/slices/productSlice";
+import NotificationInfo from "../../../common/components/notification";
+import Loading from "../../../common/pages/loading";
 const AddProduct = () => {
   const navigate = useNavigate();
-  const [stateCategory, dispatchCategory] = useProviderCategory();
-  const [statePartner, dispatchPartner] = useProviderPartner();
-  const [stateProduct, dispatchProduct] = useProviderProduct();
-  const [stateNotification, dispatchNotification] = useProviderNotification();
+  const dispatch = useDispatch();
+  const { products, message, notification, loading } = useSelector(
+    (state) => state.product
+  );
+  const { partners } = useSelector((state) => state.partner);
+  const { categories } = useSelector((state) => state.category);
+
   //  =================================================================
   //                          Loading category
   //  =================================================================
 
   useEffect(() => {
     (async () => {
-      if (statePartner.partners.length < 1) {
-        const getPartners = await getAllPartners();
-        dispatchPartner(actions.getPartners(getPartners));
+      if (partners.length < 1) {
+        dispatch(getAllPartnerThunk());
       }
-      if (stateCategory.categories.length < 1) {
-        const getCategories = await getAllCategories();
-        dispatchCategory(actions.getCategories(getCategories));
+      if (categories.length < 1) {
+        dispatch(getAllCategoriesThunk());
       }
       return;
     })();
@@ -56,7 +61,12 @@ const AddProduct = () => {
     profit: "",
     description: "",
     linkProduct: "",
+    season: "",
+    hotProduct: true,
+    saleProduct: true,
   });
+
+  console.log(dataProduct);
 
   const [isOneColor, setIsAddOneColor] = useState(false);
 
@@ -102,11 +112,7 @@ const AddProduct = () => {
   };
 
   const onListenCreate = async () => {
-    const product = await createProduct(dataProduct);
-    if (product) {
-      dispatchProduct(actions.createProduct(product));
-      dispatchNotification(actions.setNotificationAdd(true));
-    }
+    dispatch(createProductThunk(dataProduct));
   };
 
   const data = {
@@ -120,6 +126,28 @@ const AddProduct = () => {
       value: dataProduct.publish,
       classname: "select select_publish",
       data: enumPublish.selects,
+    },
+    //  =================================================================
+    //                          Hot product select
+    //  =================================================================
+
+    selectHotProduct: {
+      name: "hotProduct",
+      onListen: formListen,
+      value: dataProduct.hotProduct,
+      classname: "select select_publish",
+      data: enumHotProduct.selects,
+    },
+    //  =================================================================
+    //                          Sale Product select
+    //  =================================================================
+
+    selectSaleProduct: {
+      name: "saleProduct",
+      onListen: formListen,
+      value: dataProduct.saleProduct,
+      classname: "select select_publish",
+      data: enumSaleProduct.selects,
     },
 
     //  =================================================================
@@ -179,10 +207,25 @@ const AddProduct = () => {
       type: "select",
       classnameFormGroup: "form_group",
       lable: "Category",
-      dataSelect: stateCategory?.categories || [],
+      dataSelect: categories || [],
       classnameSelect: "select select_edit_product",
       inputValue: dataProduct.category,
       inputName: "category",
+      inputListen: formListen,
+    },
+
+    //  =================================================================
+    //                          form group seasson
+    //  =================================================================
+
+    formGroupSeason: {
+      type: "select",
+      classnameFormGroup: "form_group",
+      lable: "Season",
+      dataSelect: enumSeason.selects || [],
+      classnameSelect: "select select_edit_product",
+      inputValue: dataProduct.season,
+      inputName: "season",
       inputListen: formListen,
     },
 
@@ -208,7 +251,7 @@ const AddProduct = () => {
       type: "select",
       classnameFormGroup: "form_group",
       lable: "Partner",
-      dataSelect: statePartner.partners,
+      dataSelect: partners,
       classnameSelect: "select select_edit_product",
       inputValue: dataProduct.partner,
       inputName: "partner",
@@ -272,30 +315,34 @@ const AddProduct = () => {
     param: dataProduct.code,
   };
 
-  const dataNotification = {
-    title: "Notification",
-    body: "Product created successfully",
-  };
-
   return (
-    <MainLayout>
-      <Breadcrumb data={addProductBreadcrumb} />
-      <div className="product product_detail_page">
-        <div className="product_detail_page_left">
-          <BoxAddProduct type="addProduct" data={data} />
-        </div>
-        <div className="product_detail_page_right">
-          <BoxViewEditProduct type="viewEditProduct" data={dataViewEdit} />
-          <div className="product_detail_page_right_bottom">
-            {/* <BoxView />
+    <>
+      {loading ? (
+        <Loading />
+      ) : (
+        <MainLayout>
+          <Breadcrumb data={addProductBreadcrumb} />
+          <div className="product product_detail_page">
+            <div className="product_detail_page_left">
+              <BoxAddProduct type="addProduct" data={data} />
+            </div>
+            <div className="product_detail_page_right">
+              <BoxViewEditProduct type="viewEditProduct" data={dataViewEdit} />
+              <div className="product_detail_page_right_bottom">
+                {/* <BoxView />
             <BoxView /> */}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      {stateNotification.notification.add && (
-        <Notification type="add" data={dataNotification} />
+          {notification && (
+            <NotificationInfo
+              info={message}
+              handleClose={() => dispatch(closeMessage(""))}
+            />
+          )}
+        </MainLayout>
       )}
-    </MainLayout>
+    </>
   );
 };
 
